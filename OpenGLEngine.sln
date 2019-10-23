@@ -5,6 +5,11 @@ VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLEngine", "OpenGLEngine\OpenGLEngine.vcxproj", "{0B363864-A8A8-448A-A1F4-564A92B6C7DA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EAC7B539-C3B4-4F8E-B533-D8314CCDBFDE}"
+	ProjectSection(SolutionItems) = preProject
+		OpenGLEngine\level.json = OpenGLEngine\level.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

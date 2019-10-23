@@ -97,7 +97,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\glm;C:\Users\User\Documents\Visual Studio 2019\Libraries\glad\include;C:\Users\User\source\repos\OpenGLEngine\OpenGLEngine;C:\Users\User\source\repos\OpenGLEngine\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN32\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\json-develop\single_include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glm;C:\Users\User\Documents\Visual Studio 2019\Libraries\glad\include;C:\Users\User\source\repos\OpenGLEngine\OpenGLEngine;C:\Users\User\source\repos\OpenGLEngine\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN32\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,7 +131,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\glm;C:\Users\User\Documents\Visual Studio 2019\Libraries\glad\include;C:\Users\User\source\repos\OpenGLEngine\OpenGLEngine;C:\Users\User\source\repos\OpenGLEngine\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN32\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\json-develop\single_include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glm;C:\Users\User\Documents\Visual Studio 2019\Libraries\glad\include;C:\Users\User\source\repos\OpenGLEngine\OpenGLEngine;C:\Users\User\source\repos\OpenGLEngine\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN32\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,6 +154,8 @@
     <ClInclude Include="shader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lightShader.fs" />
+    <None Include="lightShader.vs" />
     <None Include="shader.fs" />
     <None Include="shader.vs" />
   </ItemGroup>

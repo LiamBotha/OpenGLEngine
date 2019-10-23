@@ -1,0 +1,38 @@
+{
+  "Rooms": [
+    {
+      "Position": [ 0, 0, 0 ],
+      "Length": 5,
+      "Width": 2,
+      "Height": 2,
+      "FloorTexture": 1,
+      "WallTexture": 1,
+      "CeilingTexture": 1,
+      "Doors": [ false, false, false, false ]
+    },
+    {
+      "Position": [ 0, 6, 0 ],
+      "Length": 5,
+      "Width": 2,
+      "Height": 2.5,
+      "FloorTexture": 1,
+      "WallTexture": 1,
+      "CeilingTexture": 1,
+      "Doors": [ false, false, false, false ]
+    }
+  ],
+  "Models" :[
+    {
+      "ObjectID": 1,
+      "Position": [ 0, 0, 0 ],
+      "Rotation": 0
+    }
+  ],
+  "Lights": [
+    {
+      "Type": 0,
+      "Color": [0,0,0],
+      "Position": [ 0, 0, 0 ]
+    }
+  ] 
+}

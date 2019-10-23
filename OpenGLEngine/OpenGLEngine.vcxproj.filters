@@ -55,6 +55,12 @@
     <None Include="shader.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="lightShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="lightShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\container.jpg">

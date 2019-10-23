@@ -6,6 +6,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include <shader.h>
 #include <camera.h>
 #include <mesh.h>
@@ -20,6 +23,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
+void LoadLevelFromFile(string levelPath);
+string SelectTexture(int texNumber);
+
 Mesh GenerateMesh(float x, float y, float z, string texturePath);
 Mesh GenerateRoomMesh(float x, float y, float length, float width, float height, bool doors[], string texturePath);
 Room GenerateRoom(float x, float y, float length, float width, float height, bool doors[], string floorPath, string wallPath, string ceilingPath);
@@ -28,6 +34,9 @@ void AssignIndices(bool doors[4], int doorCount, vector<unsigned int> &indices, 
 void DrawQuad(int val, int xWidth, vector<unsigned int> &indices);
 void DrawDoor(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices);
 void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices);
+
+void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices);
+glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -42,6 +51,11 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+// lighting
+glm::vec3 lightPos(0.0f, 0.5f, 0.0f);
+
+vector<Room> rooms = {};
 
 int main()
 {
@@ -84,21 +98,25 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader ourShader("shader.vs", "shader.fs");
+	Shader lightingShader("lightShader.vs", "lightShader.fs");
+
+	lightingShader.use();
+	lightingShader.setInt("material.diffuse", 0);
 
 	// load models
 	// -----------
-	//Model ourModel("Objects/nanosuit/nanosuit.obj");
+	LoadLevelFromFile("level.json");
 
-	bool doorA[] = { true,false,false,false };
-	bool doorB[] = { false,false,true,false };
-
-	vector<Room> rooms = {};
-
-	rooms.push_back(GenerateRoom(0, 0, 5, 2, 2, doorA, "Textures/awesomeface.png","Textures/container.jpg", "Textures/awesomeface.png"));
-	rooms.push_back(GenerateRoom(0, 6, 5, 2, 2, doorB, "Textures/awesomeface.png","Textures/container.jpg", "Textures/awesomeface.png"));
+	//bool doorA[] = { true,false,false,false };
+	//bool doorB[] = { false,false,true,false };
+	//rooms.push_back(GenerateRoom(0, 0, 5, 2, 2, doorA, "Textures/awesomeface.png","Textures/container.jpg", "Textures/awesomeface.png"));
+	//rooms.push_back(GenerateRoom(0, 6, 5, 2, 2, doorB, "Textures/awesomeface.png","Textures/container.jpg", "Textures/awesomeface.png"));
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
 
 	// render loop
 	// -----------
@@ -120,24 +138,35 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// don't forget to enable shader before setting uniforms
-		ourShader.use();
+		//ourShader.use();
+		lightingShader.use();
+		lightingShader.setVec3("light.position", lightPos);
+		lightingShader.setVec3("viewPos", camera.Position);
 
-		// view/projection transformations
+		// light properties
+		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+		// material properties
+		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+		lightingShader.setFloat("material.shininess", 40.0f);
+
+		// view/projection tranansformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
-		ourShader.setMat4("projection", projection);
-		ourShader.setMat4("view", view);
+		lightingShader.setMat4("projection", projection);
+		lightingShader.setMat4("view", view);
 
 		// render the loaded model
 		glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
 		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-		ourShader.setMat4("model", model);
-		//courModel.Draw(ourShader);
+		lightingShader.setMat4("model", model);
 
 		for (int i = 0; i < rooms.size(); ++i)
 		{
-			rooms[i].Draw(ourShader);
+			rooms[i].Draw(lightingShader);
 		}
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -205,6 +234,124 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	camera.ProcessMouseScroll(yoffset);
 }
 
+void LoadLevelFromFile(string levelPath)
+{
+	int numRooms = 0;
+	string jsonFileString = "";
+	string line = "";
+	json jsonObj;
+
+	ifstream jsonFile(levelPath);
+
+	while (jsonFile.is_open())
+	{
+		while (getline(jsonFile, line))
+		{
+			jsonFileString += line;
+		}
+		jsonFile.close();
+	}
+
+	if (jsonFileString != "")
+	{
+		jsonObj = json::parse(jsonFileString);
+	}
+
+	if (!jsonObj["Rooms"].is_null())
+	{
+		numRooms = jsonObj["Rooms"].size();
+
+		cout << numRooms << " Number of Rooms" << endl;
+
+		for (int i = 0; i < numRooms; ++i)
+		{
+			json room = jsonObj["Rooms"][i];
+
+			float roomX = 0;
+			float roomY = 0;
+			float roomZ = 0;
+
+			int length = 1;
+			int width = 2;
+			int height = 1;
+
+			int floorTex = 0;
+			int wallTex = 0;
+			int ceilingTex = 0;
+
+			if (!room["Position"][0].is_null())
+				roomX = room["Position"][0];
+			if (!room["Position"][1].is_null())
+				roomY = room["Position"][1];
+			if (!room["Position"][2].is_null())
+				roomZ = room["Position"][2];
+
+			if (!room["Length"].is_null())
+				length = room["Length"];
+			if (!room["Width"].is_null())
+				width = room["Width"];
+			if (!room["Height"].is_null())
+				height = room["Height"];
+
+			if (!room["FloorTexture"].is_null())
+				floorTex = room["FloorTexture"];
+			if (!room["WallTexture"].is_null())
+				wallTex = room["WallTexture"];
+			if (!room["CeilingTexture"].is_null())
+				ceilingTex = room["CeilingTexture"];
+
+			bool doors[4] = { false, false, false, false };
+
+			if (!room["Doors"][0].is_null())
+				doors[0] = room["Doors"][0];
+
+			if (!room["Doors"][1].is_null())
+				doors[1] = room["Doors"][1];
+
+			if (!room["Doors"][2].is_null())
+				doors[2] = room["Doors"][2];
+
+			if (!room["Doors"][3].is_null())
+				doors[3] = room["Doors"][3];
+
+			string floorPath = SelectTexture(floorTex);
+			string wallPath = SelectTexture(wallTex);
+			string ceilingPath = SelectTexture(ceilingTex);
+
+			cout << roomX << ", " << roomY << ", " << roomZ << endl;
+
+			rooms.push_back(GenerateRoom(roomX, roomY, length, width, height, doors, floorPath, wallPath, ceilingPath));
+		}
+	}
+
+	if (!jsonObj["Models"].is_null())
+	{
+		numRooms = jsonObj["Models"].size();
+
+		for (int i = 0; i < numRooms; ++i)
+		{
+
+		}
+	}
+
+	if (!jsonObj["Lights"].is_null())
+	{
+		numRooms = jsonObj["Lights"].size();
+
+		for (int i = 0; i < numRooms; ++i)
+		{
+
+		}
+	}
+}
+
+string SelectTexture(int texNumber)
+{
+	string texturePath = std::string("Textures/img_") + std::to_string(texNumber) + std::string(".jpg");
+
+	return texturePath;
+}
+
 Mesh GenerateMesh(float x, float y, float z, string texturePath)
 {
 	bool doors[4] = { false,false,false,false };
@@ -269,7 +416,7 @@ Mesh GenerateRoomMesh(float x, float y, float length, float width, float height,
 	textures.push_back(tex);
 	textures.push_back(tex2);
 
-	BuildWalls(x, y, length, width, height, doors, doorCount, vertices);
+	BuildWalls(x, y, length, width, height, doors, doorCount, vertices); // minus 0.001f
 
 	AssignIndices(doors, doorCount, indices, vertices.size() - 4);
 
@@ -319,10 +466,10 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 	GenerateVert(x - (width / 2), y - (length / 2), height, 0.0, 0.0, ceilingVertices); // 3
 
 	floorIndices.push_back(0);
-	floorIndices.push_back(1);
-	floorIndices.push_back(2);
-	floorIndices.push_back(2);
 	floorIndices.push_back(3);
+	floorIndices.push_back(2);
+	floorIndices.push_back(2);
+	floorIndices.push_back(1);
 	floorIndices.push_back(0);
 
 	ceilingIndices.push_back(0);
@@ -335,6 +482,10 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 	BuildWalls(x, y, length, width, height, doors, doorCount, wallVertices);
 
 	AssignIndices(doors, doorCount, wallIndices, wallVertices.size());
+
+	CalculateNormals(wallIndices, wallVertices);
+	CalculateNormals(floorIndices, floorVertices);
+	CalculateNormals(ceilingIndices, ceilingVertices);
 
 	return Room(Mesh(floorVertices,floorIndices,floorTextures), Mesh(wallVertices, wallIndices, wallTextures), Mesh(ceilingVertices, ceilingIndices, ceilingTextures));
 }
@@ -496,6 +647,51 @@ void AssignIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, 
 	//indices.push_back(vertSize + 2);
 	//indices.push_back(vertSize + 3);
 	//indices.push_back(vertSize + 0);
+}
+
+void CalculateNormals(vector<unsigned int> &indices, vector<Vertex> &vertices)
+{
+	for (int i = 0; i < indices.size(); i += 3)
+	{
+		Vertex vert1 = vertices[indices[i]];
+		Vertex vert2 = vertices[indices[i + 1]];
+		Vertex vert3 = vertices[indices[i + 2]];
+
+		//cout << vert1.Position.x << "," << vert2.Position.x << "," << vert3.Position.x << " X pos" << endl;
+
+		glm::vec3 edgeA = vert1.Position - vert2.Position;
+		glm::vec3 edgeB = vert1.Position - vert3.Position;
+
+		glm::vec3 normal = CrossProduct(edgeA, edgeB);
+
+		vertices[indices[i]].Normal = normal;
+		vertices[indices[i + 1]].Normal = normal;
+		vertices[indices[i + 2]].Normal = normal;
+
+		cout << i << "inidices i " << endl;
+
+		//cout << edgeA.x << "," << edgeA.y << "," << edgeA.z << " - Edge A" << endl;
+		//cout << edgeB.x << "," << edgeB.y << "," << edgeB.z << " - Edge B" << endl;
+	}
+
+	for (int i = 0; i < vertices.size(); ++i)
+	{
+		vertices[i].Normal = glm::normalize(vertices[i].Normal);
+	}
+}
+
+glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
+{
+	int crossX = (a.y * b.z) - (a.z * b.y);
+	int crossY = (a.x * b.z) - (a.z * b.x);
+	int crossZ = (a.x * b.y) - (a.y * b.x);
+
+	//cout << crossX;
+	//cout << crossY;
+	//cout << crossZ;
+	//cout << endl;;
+
+	return glm::vec3(crossX, crossY, crossZ);
 }
 
 void DrawQuad(int val, int xWidth, vector<unsigned int> &indices)
