@@ -161,8 +161,6 @@ unsigned int TextureFromFile(const char* path)
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
-	stbi_set_flip_vertically_on_load(true);
-
 	int width, height, nrComponents;
 	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 	if (data)
@@ -201,8 +199,6 @@ Texture LoadTexture(const char* path, string typeName)
 	texture.id = TextureFromFile(path);
 	texture.type = typeName;
 	texture.path = path;
-
-	std::cout << texture.id << " texID" << endl;
 
 	return texture;
 }

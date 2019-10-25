@@ -6,9 +6,9 @@
       "Width": 2,
       "Height": 2,
       "FloorTexture": 1,
-      "WallTexture": 1,
+      "WallTexture": 2,
       "CeilingTexture": 1,
-      "Doors": [ false, false, false, false ]
+      "Doors": [ true, false, false, true ]
     },
     {
       "Position": [ 0, 6, 0 ],
@@ -16,9 +16,9 @@
       "Width": 2,
       "Height": 2.5,
       "FloorTexture": 1,
-      "WallTexture": 1,
+      "WallTexture": 0,
       "CeilingTexture": 1,
-      "Doors": [ false, false, false, false ]
+      "Doors": [ false, false, true, false ]
     }
   ],
   "Models" :[

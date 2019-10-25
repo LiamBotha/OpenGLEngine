@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="LevelGen.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="room.h" />
@@ -160,8 +161,9 @@
     <None Include="shader.vs" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Textures\awesomeface.png" />
-    <Image Include="Textures\container.jpg" />
+    <Image Include="Textures\img_0.jpg" />
+    <Image Include="Textures\img_1.jpg" />
+    <Image Include="Textures\img_2.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -31,8 +31,8 @@ Mesh GenerateRoomMesh(float x, float y, float length, float width, float height,
 Room GenerateRoom(float x, float y, float length, float width, float height, bool doors[], string floorPath, string wallPath, string ceilingPath);
 void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices);
 void AssignIndices(bool doors[4], int doorCount, vector<unsigned int> &indices, int vertSize);
-void DrawQuad(int val, int xWidth, vector<unsigned int> &indices);
-void DrawDoor(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices);
+void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices);
+void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices);
 void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices);
 
 void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices);
@@ -144,8 +144,8 @@ int main()
 		lightingShader.setVec3("viewPos", camera.Position);
 
 		// light properties
-		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		lightingShader.setVec3("light.ambient", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("light.diffuse", 0.2f, 0.2f, 0.2f);
 		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
 		// material properties
@@ -492,48 +492,54 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 
 void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices)
 {
-	float downTex = 0.0;
+	int downTex = 0;
+
 	//Bottom Wall Verts
 	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); // 4
-	downTex += 1.0;
+	downTex += 1.0 * width / 2;
 
 	if (doors[0] == true)
 	{
+		cout << "door 0" << endl;
 		GenerateVert(x - (width / 4), y + (length / 2), 0, downTex, 1.0, vertices); // 5.1
 		GenerateVert(x + (width / 4), y + (length / 2), 0, downTex + 1, 1.0, vertices); // 5.2
 		downTex += 2.0;
 	}
 
-	GenerateVert(x + (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); // 5
-	downTex += 1.0;
+	GenerateVert(x + (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
+	downTex += 1.0 * length / 2;
 
 	if (doors[1] == true)
 	{
+		cout << "door 1" << endl;
 		GenerateVert(x + (width / 2), y + (length / 4), 0, downTex, 1.0, vertices); // 6.1
 		GenerateVert(x + (width / 2), y - (length / 4), 0, downTex + 1, 1.0, vertices); // 6.1
 		downTex += 2.0;
 	}
 
-	GenerateVert(x + (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); // 6
-	downTex += 1.0;
+	GenerateVert(x + (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); //
+	downTex += 1.0 * width / 2;
 
 	if (doors[2] == true)
 	{
+		cout << "door 2" << endl;
 		GenerateVert(x + (width / 4), y - (length / 2), 0, downTex, 1.0, vertices); // 7.1
 		GenerateVert(x - (width / 4), y - (length / 2), 0, downTex + 1, 1.0, vertices); // 7.2
 		downTex += 2.0;
 	}
 
 	GenerateVert(x - (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); // 7
-	downTex += 1.0;
+	downTex += 1.0 * length / 2;
+
 	if (doors[3] == true)
 	{
+		cout << "door 3" << endl;
 		GenerateVert(x - (width / 2), y - (length / 4), 0, downTex, 1.0, vertices); // 8.1
 		GenerateVert(x - (width / 2), y + (length / 4), 0, downTex + 1, 1.0, vertices); // 8.2
 		downTex += 2.0;
 	}
 
-	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); // 8
+	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
 
 	downTex = 1.0;
 	//Middle Verts
@@ -566,20 +572,22 @@ void BuildWalls(float x, float y, float length, float width, float height, bool 
 	}
 
 	downTex = 0.0;
+	//nextTex = 0.0;
 
 	// Top Wall Verts
 	GenerateVert(x - (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 9
-	downTex += 1.0;
+	downTex += 1.0 * width / 2;
 
 	if (doors[0] == true)
 	{
+
 		GenerateVert(x - (width / 4), y + (length / 2), height, downTex, 0.0, vertices); // 8.1
 		GenerateVert(x + (width / 4), y + (length / 2), height, downTex + 1, 0.0, vertices); // 8.2
 		downTex += 2.0;
 	}
 
 	GenerateVert(x + (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 10
-	downTex += 1.0;
+	downTex += 1.0 * length /2 ;
 
 	if (doors[1] == true)
 	{
@@ -589,7 +597,7 @@ void BuildWalls(float x, float y, float length, float width, float height, bool 
 	}
 
 	GenerateVert(x + (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 11
-	downTex += 1.0;
+	downTex += 1.0 * width / 2;
 
 	if (doors[2] == true)
 	{
@@ -599,7 +607,7 @@ void BuildWalls(float x, float y, float length, float width, float height, bool 
 	}
 
 	GenerateVert(x - (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 12
-	downTex += 1.0;
+	downTex += 1.0 * length / 2;
 
 	if (doors[3] == true)
 	{
@@ -613,7 +621,7 @@ void BuildWalls(float x, float y, float length, float width, float height, bool 
 
 void AssignIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, int vertSize)
 {
-	std::cout << vertSize << " - verts" << std::endl;
+	//std::cout << vertSize << " - verts" << std::endl;
 
 	//indices.push_back(vertSize - 11 - (doorCount * 6));
 	//indices.push_back(vertSize - 12 - (doorCount * 6));
@@ -632,12 +640,12 @@ void AssignIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, 
 
 		if (doors != nullptr && doors[j] == true)
 		{
-			DrawDoor(i, yWidth, xWidth, doorCount, j + 1, indices);
+			DrawDoorIndices(i, yWidth, xWidth, doorCount, j + 1, indices);
 			i += 2;
 		}
 		else
 		{
-			DrawQuad(i, yWidth, indices); 
+			DrawQuadIndices(i, yWidth, indices); 
 		}
 	}
 
@@ -668,8 +676,6 @@ void CalculateNormals(vector<unsigned int> &indices, vector<Vertex> &vertices)
 		vertices[indices[i + 1]].Normal = normal;
 		vertices[indices[i + 2]].Normal = normal;
 
-		cout << i << "inidices i " << endl;
-
 		//cout << edgeA.x << "," << edgeA.y << "," << edgeA.z << " - Edge A" << endl;
 		//cout << edgeB.x << "," << edgeB.y << "," << edgeB.z << " - Edge B" << endl;
 	}
@@ -694,7 +700,7 @@ glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
 	return glm::vec3(crossX, crossY, crossZ);
 }
 
-void DrawQuad(int val, int xWidth, vector<unsigned int> &indices)
+void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices)
 {
 	indices.push_back(val);
 	indices.push_back(val + 1);
@@ -705,7 +711,7 @@ void DrawQuad(int val, int xWidth, vector<unsigned int> &indices)
 	indices.push_back(val);
 }
 
-void DrawDoor(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices)
+void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices)
 {
 	int doorOffset = (2 + (2 * doorCount));
 
