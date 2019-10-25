@@ -2,16 +2,16 @@
   "Rooms": [
     {
       "Position": [ 0, 0, 0 ],
-      "Length": 5,
+      "Length": 7,
       "Width": 2,
-      "Height": 2,
+      "Height": 4,
       "FloorTexture": 1,
       "WallTexture": 2,
       "CeilingTexture": 1,
       "Doors": [ true, false, false, true ]
     },
     {
-      "Position": [ 0, 6, 0 ],
+      "Position": [ 0, 7, 0 ],
       "Length": 5,
       "Width": 2,
       "Height": 2.5,

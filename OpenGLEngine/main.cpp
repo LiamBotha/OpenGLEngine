@@ -13,6 +13,7 @@ using json = nlohmann::json;
 #include <camera.h>
 #include <mesh.h>
 #include <room.h>
+#include <LevelGen.h>
 
 #include <iostream>
 #include <vector>
@@ -26,14 +27,14 @@ void processInput(GLFWwindow* window);
 void LoadLevelFromFile(string levelPath);
 string SelectTexture(int texNumber);
 
-Mesh GenerateMesh(float x, float y, float z, string texturePath);
-Mesh GenerateRoomMesh(float x, float y, float length, float width, float height, bool doors[], string texturePath);
+//Mesh GenerateMesh(float x, float y, float z, string texturePath);
+//Mesh GenerateRoomMesh(float x, float y, float length, float width, float height, bool doors[], string texturePath);
 Room GenerateRoom(float x, float y, float length, float width, float height, bool doors[], string floorPath, string wallPath, string ceilingPath);
-void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices);
-void AssignIndices(bool doors[4], int doorCount, vector<unsigned int> &indices, int vertSize);
-void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices);
-void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices);
-void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices);
+//void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices);
+//void AssignIndices(bool doors[4], int doorCount, vector<unsigned int> &indices, int vertSize);
+//void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices);
+//void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices);
+//void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices);
 
 void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices);
 glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b);
@@ -352,76 +353,76 @@ string SelectTexture(int texNumber)
 	return texturePath;
 }
 
-Mesh GenerateMesh(float x, float y, float z, string texturePath)
-{
-	bool doors[4] = { false,false,false,false };
-	vector<Vertex> vertices = {};
-	vector<unsigned int> indices = {};
-	vector<Texture> textures = {};
-
-	Vertex vertA = {};
-	Vertex vertB = {};
-	Vertex vertC = {};
-	Vertex vertD = {};
-
-	vertA.Position = { x - 1.0, y - 1.0, z + 1.0 };
-	vertB.Position = { x + 1.0, y - 1.0, z + 1.0 };
-	vertC.Position = { x + 1.0, y + 1.0, z + 1.0 };
-	vertD.Position = { x - 1.0, y + 1.0, z + 1.0 };
-
-	vertA.TexCoords = { 0.0f,0.0f };
-	vertB.TexCoords = { 1.0f,0.0f };
-	vertC.TexCoords = { 1.0f,1.0f };
-	vertD.TexCoords = { 0.0f,1.0f };
-
-	vertices.push_back(vertA);
-	vertices.push_back(vertB);
-	vertices.push_back(vertC);
-	vertices.push_back(vertD);
-
-	indices.push_back(0);
-	indices.push_back(1);
-	indices.push_back(2);
-	indices.push_back(2);
-	indices.push_back(3);
-	indices.push_back(0);
-
-	//AssignIndices(doors, 0, indices, vertices.size());
-
-	Texture tex = LoadTexture(texturePath.c_str(), "texture_diffuse");
-
-	textures.push_back(tex);
-
-	return Mesh(vertices, indices, textures);
-}
-
-Mesh GenerateRoomMesh(float x, float y, float length, float width, float height,bool doors[], string texturePath)
-{
-	int doorCount = 0;
-	for (int i = 0; i < 4; ++i)
-	{
-		if (doors[i] == true)
-		{
-			++doorCount;
-		}
-	}
-
-	vector<Vertex> vertices = {};
-	vector<unsigned int> indices = {};
-	vector<Texture> textures = {};
-
-	Texture tex = LoadTexture(texturePath.c_str(), "texture_diffuse");
-	Texture tex2 = LoadTexture("Textures/awesomeface.png", "texture_diffuse");
-
-	textures.push_back(tex);
-	textures.push_back(tex2);
-
-	BuildWalls(x, y, length, width, height, doors, doorCount, vertices); // minus 0.001f
-
-	AssignIndices(doors, doorCount, indices, vertices.size() - 4);
-
-	return Mesh(vertices, indices, textures);
-}
+//Mesh GenerateMesh(float x, float y, float z, string texturePath)
+//{
+//	bool doors[4] = { false,false,false,false };
+//	vector<Vertex> vertices = {};
+//	vector<unsigned int> indices = {};
+//	vector<Texture> textures = {};
+//
+//	Vertex vertA = {};
+//	Vertex vertB = {};
+//	Vertex vertC = {};
+//	Vertex vertD = {};
+//
+//	vertA.Position = { x - 1.0, y - 1.0, z + 1.0 };
+//	vertB.Position = { x + 1.0, y - 1.0, z + 1.0 };
+//	vertC.Position = { x + 1.0, y + 1.0, z + 1.0 };
+//	vertD.Position = { x - 1.0, y + 1.0, z + 1.0 };
+//
+//	vertA.TexCoords = { 0.0f,0.0f };
+//	vertB.TexCoords = { 1.0f,0.0f };
+//	vertC.TexCoords = { 1.0f,1.0f };
+//	vertD.TexCoords = { 0.0f,1.0f };
+//
+//	vertices.push_back(vertA);
+//	vertices.push_back(vertB);
+//	vertices.push_back(vertC);
+//	vertices.push_back(vertD);
+//
+//	indices.push_back(0);
+//	indices.push_back(1);
+//	indices.push_back(2);
+//	indices.push_back(2);
+//	indices.push_back(3);
+//	indices.push_back(0);
+//
+//	//AssignIndices(doors, 0, indices, vertices.size());
+//
+//	Texture tex = LoadTexture(texturePath.c_str(), "texture_diffuse");
+//
+//	textures.push_back(tex);
+//
+//	return Mesh(vertices, indices, textures);
+//}
+//
+//Mesh GenerateRoomMesh(float x, float y, float length, float width, float height,bool doors[], string texturePath)
+//{
+//	int doorCount = 0;
+//	for (int i = 0; i < 4; ++i)
+//	{
+//		if (doors[i] == true)
+//		{
+//			++doorCount;
+//		}
+//	}
+//
+//	vector<Vertex> vertices = {};
+//	vector<unsigned int> indices = {};
+//	vector<Texture> textures = {};
+//
+//	Texture tex = LoadTexture(texturePath.c_str(), "texture_diffuse");
+//	Texture tex2 = LoadTexture("Textures/awesomeface.png", "texture_diffuse");
+//
+//	textures.push_back(tex);
+//	textures.push_back(tex2);
+//
+//	BuildWalls(x, y, length, width, height, doors, doorCount, vertices); // minus 0.001f
+//
+//	AssignIndices(doors, doorCount, indices, vertices.size() - 4);
+//
+//	return Mesh(vertices, indices, textures);
+//}
 
 Room GenerateRoom(float x, float y, float length, float width, float height, bool doors[],string floorPath, string wallPath,string ceilingPath)
 {
@@ -455,14 +456,17 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 	Texture ceilingTex = LoadTexture(ceilingPath.c_str(), "texture_diffuse");
 	ceilingTextures.push_back(ceilingTex);
 
-	GenerateVert(x - (width / 2), y + (length / 2), 0, 0.0, 1.0, floorVertices); // 0
-	GenerateVert(x + (width / 2), y + (length / 2), 0, 1.0, 1.0, floorVertices); // 1
-	GenerateVert(x + (width / 2), y - (length / 2), 0, 1.0, 0.0, floorVertices); // 2
+	int texCoordWidth = (1 * width / 2);
+	int texCoordLength = (1 * length / 2);
+
+	GenerateVert(x - (width / 2), y + (length / 2), 0, 0.0, texCoordLength, floorVertices); // 0
+	GenerateVert(x + (width / 2), y + (length / 2), 0, texCoordWidth, texCoordLength, floorVertices); // 1
+	GenerateVert(x + (width / 2), y - (length / 2), 0, texCoordWidth, 0.0, floorVertices); // 2
 	GenerateVert(x - (width / 2), y - (length / 2), 0, 0.0, 0.0, floorVertices); // 3
 
-	GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, 1.0, ceilingVertices); // 0
-	GenerateVert(x + (width / 2), y + (length / 2), height, 1.0, 1.0, ceilingVertices); // 1
-	GenerateVert(x + (width / 2), y - (length / 2), height, 1.0, 0.0, ceilingVertices); // 2
+	GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, texCoordLength, ceilingVertices); // 0
+	GenerateVert(x + (width / 2), y + (length / 2), height, texCoordWidth, texCoordLength, ceilingVertices); // 1
+	GenerateVert(x + (width / 2), y - (length / 2), height, texCoordWidth, 0.0, ceilingVertices); // 2
 	GenerateVert(x - (width / 2), y - (length / 2), height, 0.0, 0.0, ceilingVertices); // 3
 
 	floorIndices.push_back(0);
@@ -479,9 +483,10 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 	ceilingIndices.push_back(3);
 	ceilingIndices.push_back(0);
 
-	BuildWalls(x, y, length, width, height, doors, doorCount, wallVertices);
-
-	AssignIndices(doors, doorCount, wallIndices, wallVertices.size());
+	//BuildWalls(x, y, length, width, height, doors, doorCount, wallVertices);
+	//AssignIndices(doors, doorCount, wallIndices, wallVertices.size());
+	BuildNormalWalls(x, y, length, width, height, doors, wallVertices);
+	AssignNewIndices(doors, doorCount, wallIndices, wallVertices.size());
 
 	CalculateNormals(wallIndices, wallVertices);
 	CalculateNormals(floorIndices, floorVertices);
@@ -490,172 +495,172 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 	return Room(Mesh(floorVertices,floorIndices,floorTextures), Mesh(wallVertices, wallIndices, wallTextures), Mesh(ceilingVertices, ceilingIndices, ceilingTextures));
 }
 
-void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices)
-{
-	int downTex = 0;
-
-	//Bottom Wall Verts
-	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); // 4
-	downTex += 1.0 * width / 2;
-
-	if (doors[0] == true)
-	{
-		cout << "door 0" << endl;
-		GenerateVert(x - (width / 4), y + (length / 2), 0, downTex, 1.0, vertices); // 5.1
-		GenerateVert(x + (width / 4), y + (length / 2), 0, downTex + 1, 1.0, vertices); // 5.2
-		downTex += 2.0;
-	}
-
-	GenerateVert(x + (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
-	downTex += 1.0 * length / 2;
-
-	if (doors[1] == true)
-	{
-		cout << "door 1" << endl;
-		GenerateVert(x + (width / 2), y + (length / 4), 0, downTex, 1.0, vertices); // 6.1
-		GenerateVert(x + (width / 2), y - (length / 4), 0, downTex + 1, 1.0, vertices); // 6.1
-		downTex += 2.0;
-	}
-
-	GenerateVert(x + (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); //
-	downTex += 1.0 * width / 2;
-
-	if (doors[2] == true)
-	{
-		cout << "door 2" << endl;
-		GenerateVert(x + (width / 4), y - (length / 2), 0, downTex, 1.0, vertices); // 7.1
-		GenerateVert(x - (width / 4), y - (length / 2), 0, downTex + 1, 1.0, vertices); // 7.2
-		downTex += 2.0;
-	}
-
-	GenerateVert(x - (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); // 7
-	downTex += 1.0 * length / 2;
-
-	if (doors[3] == true)
-	{
-		cout << "door 3" << endl;
-		GenerateVert(x - (width / 2), y - (length / 4), 0, downTex, 1.0, vertices); // 8.1
-		GenerateVert(x - (width / 2), y + (length / 4), 0, downTex + 1, 1.0, vertices); // 8.2
-		downTex += 2.0;
-	}
-
-	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
-
-	downTex = 1.0;
-	//Middle Verts
-	if (doors[0] == true)
-	{
-		GenerateVert(x - (width / 4), y + (length / 2), (height / 1.5), downTex, 1.0, vertices); // 5.1
-		GenerateVert(x + (width / 4), y + (length / 2), (height / 1.5), downTex + 1, 1.0, vertices); // 5.2
-		downTex += 3;
-	}
-	else downTex++;
-	if (doors[1] == true)
-	{
-		GenerateVert(x + (width / 2), y + (length / 4), (height / 1.5), downTex, 1.0, vertices); // 6.1
-		GenerateVert(x + (width / 2), y - (length / 4), (height / 1.5), downTex + 1, 1.0, vertices); // 6.1
-		downTex += 3;
-	}
-	else downTex++;
-	if (doors[2] == true)
-	{
-		GenerateVert(x + (width / 4), y - (length / 2), (height / 1.5), downTex, 1.0, vertices); // 7.1
-		GenerateVert(x - (width / 4), y - (length / 2), (height / 1.5), downTex + 1, 1.0, vertices); // 7.2
-		downTex += 3;
-	}
-	else downTex++;
-	if (doors[3] == true)
-	{
-		GenerateVert(x - (width / 2), y - (length / 4), (height / 1.5), downTex, 1.0, vertices); // 8.1
-		GenerateVert(x - (width / 2), y + (length / 4), (height / 1.5), downTex + 1, 1.0, vertices); // 8.2
-		downTex += 3;
-	}
-
-	downTex = 0.0;
-	//nextTex = 0.0;
-
-	// Top Wall Verts
-	GenerateVert(x - (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 9
-	downTex += 1.0 * width / 2;
-
-	if (doors[0] == true)
-	{
-
-		GenerateVert(x - (width / 4), y + (length / 2), height, downTex, 0.0, vertices); // 8.1
-		GenerateVert(x + (width / 4), y + (length / 2), height, downTex + 1, 0.0, vertices); // 8.2
-		downTex += 2.0;
-	}
-
-	GenerateVert(x + (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 10
-	downTex += 1.0 * length /2 ;
-
-	if (doors[1] == true)
-	{
-		GenerateVert(x + (width / 2), y + (length / 4), height, downTex, 0.0, vertices); // 8.1
-		GenerateVert(x + (width / 2), y - (length / 4), height, downTex + 1, 0.0, vertices); // 8.2
-		downTex += 2.0;
-	}
-
-	GenerateVert(x + (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 11
-	downTex += 1.0 * width / 2;
-
-	if (doors[2] == true)
-	{
-		GenerateVert(x + (width / 4), y - (length / 2), height, downTex, 0.0, vertices); // 8.1
-		GenerateVert(x - (width / 4), y - (length / 2), height, downTex + 1, 0.0, vertices); // 8.2
-		downTex += 2.0;
-	}
-
-	GenerateVert(x - (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 12
-	downTex += 1.0 * length / 2;
-
-	if (doors[3] == true)
-	{
-		GenerateVert(x - (width / 2), y - (length / 4), height, downTex, 0.0, vertices); // 8.1
-		GenerateVert(x - (width / 2), y + (length / 4), height, downTex + 1, 0.0, vertices); // 8.2
-		downTex += 2.0;
-	}
-
-	GenerateVert(x - (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 13
-}
-
-void AssignIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, int vertSize)
-{
-	//std::cout << vertSize << " - verts" << std::endl;
-
-	//indices.push_back(vertSize - 11 - (doorCount * 6));
-	//indices.push_back(vertSize - 12 - (doorCount * 6));
-	//indices.push_back(vertSize - 13 - (doorCount * 6));
-	//indices.push_back(vertSize - 13 - (doorCount * 6));
-	//indices.push_back(vertSize - 14 - (doorCount * 6));
-	//indices.push_back(vertSize - 11 - (doorCount * 6));
-
-	int yWidth = 5 + (4 * doorCount);
-	int xWidth = (5 + (2 * doorCount));
-
-	int val2 = (vertSize - (xWidth * 2 + (doorCount * 2)));
-
-	for (int i = 0, j = 0; j < 4; ++i, ++j) // increment j in code
-	{
-
-		if (doors != nullptr && doors[j] == true)
-		{
-			DrawDoorIndices(i, yWidth, xWidth, doorCount, j + 1, indices);
-			i += 2;
-		}
-		else
-		{
-			DrawQuadIndices(i, yWidth, indices); 
-		}
-	}
-
-	//indices.push_back(vertSize + 0);
-	//indices.push_back(vertSize + 1);
-	//indices.push_back(vertSize + 2);
-	//indices.push_back(vertSize + 2);
-	//indices.push_back(vertSize + 3);
-	//indices.push_back(vertSize + 0);
-}
+////void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices)
+////{
+////	int downTex = 0;
+////
+////	//Bottom Wall Verts
+////	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); // 4
+////	downTex += 1.0 * width / 2;
+////
+////	if (doors[0] == true)
+////	{
+////		cout << "door 0" << endl;
+////		GenerateVert(x - (width / 4), y + (length / 2), 0, downTex, 1.0, vertices); // 5.1
+////		GenerateVert(x + (width / 4), y + (length / 2), 0, downTex + 1, 1.0, vertices); // 5.2
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x + (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
+////	downTex += 1.0 * length / 2;
+////
+////	if (doors[1] == true)
+////	{
+////		cout << "door 1" << endl;
+////		GenerateVert(x + (width / 2), y + (length / 4), 0, downTex, 1.0, vertices); // 6.1
+////		GenerateVert(x + (width / 2), y - (length / 4), 0, downTex + 1, 1.0, vertices); // 6.1
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x + (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); //
+////	downTex += 1.0 * width / 2;
+////
+////	if (doors[2] == true)
+////	{
+////		cout << "door 2" << endl;
+////		GenerateVert(x + (width / 4), y - (length / 2), 0, downTex, 1.0, vertices); // 7.1
+////		GenerateVert(x - (width / 4), y - (length / 2), 0, downTex + 1, 1.0, vertices); // 7.2
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x - (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); // 7
+////	downTex += 1.0 * length / 2;
+////
+////	if (doors[3] == true)
+////	{
+////		cout << "door 3" << endl;
+////		GenerateVert(x - (width / 2), y - (length / 4), 0, downTex, 1.0, vertices); // 8.1
+////		GenerateVert(x - (width / 2), y + (length / 4), 0, downTex + 1, 1.0, vertices); // 8.2
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
+////
+////	downTex = 1.0;
+////	//Middle Verts
+////	if (doors[0] == true)
+////	{
+////		GenerateVert(x - (width / 4), y + (length / 2), (height / 1.5), downTex, 1.0, vertices); // 5.1
+////		GenerateVert(x + (width / 4), y + (length / 2), (height / 1.5), downTex + 1, 1.0, vertices); // 5.2
+////		downTex += 3;
+////	}
+////	else downTex++;
+////	if (doors[1] == true)
+////	{
+////		GenerateVert(x + (width / 2), y + (length / 4), (height / 1.5), downTex, 1.0, vertices); // 6.1
+////		GenerateVert(x + (width / 2), y - (length / 4), (height / 1.5), downTex + 1, 1.0, vertices); // 6.1
+////		downTex += 3;
+////	}
+////	else downTex++;
+////	if (doors[2] == true)
+////	{
+////		GenerateVert(x + (width / 4), y - (length / 2), (height / 1.5), downTex, 1.0, vertices); // 7.1
+////		GenerateVert(x - (width / 4), y - (length / 2), (height / 1.5), downTex + 1, 1.0, vertices); // 7.2
+////		downTex += 3;
+////	}
+////	else downTex++;
+////	if (doors[3] == true)
+////	{
+////		GenerateVert(x - (width / 2), y - (length / 4), (height / 1.5), downTex, 1.0, vertices); // 8.1
+////		GenerateVert(x - (width / 2), y + (length / 4), (height / 1.5), downTex + 1, 1.0, vertices); // 8.2
+////		downTex += 3;
+////	}
+////
+////	downTex = 0.0;
+////	//nextTex = 0.0;
+////
+////	// Top Wall Verts
+////	GenerateVert(x - (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 9
+////	downTex += 1.0 * width / 2;
+////
+////	if (doors[0] == true)
+////	{
+////
+////		GenerateVert(x - (width / 4), y + (length / 2), height, downTex, 0.0, vertices); // 8.1
+////		GenerateVert(x + (width / 4), y + (length / 2), height, downTex + 1, 0.0, vertices); // 8.2
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x + (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 10
+////	downTex += 1.0 * length /2 ;
+////
+////	if (doors[1] == true)
+////	{
+////		GenerateVert(x + (width / 2), y + (length / 4), height, downTex, 0.0, vertices); // 8.1
+////		GenerateVert(x + (width / 2), y - (length / 4), height, downTex + 1, 0.0, vertices); // 8.2
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x + (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 11
+////	downTex += 1.0 * width / 2;
+////
+////	if (doors[2] == true)
+////	{
+////		GenerateVert(x + (width / 4), y - (length / 2), height, downTex, 0.0, vertices); // 8.1
+////		GenerateVert(x - (width / 4), y - (length / 2), height, downTex + 1, 0.0, vertices); // 8.2
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x - (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 12
+////	downTex += 1.0 * length / 2;
+////
+////	if (doors[3] == true)
+////	{
+////		GenerateVert(x - (width / 2), y - (length / 4), height, downTex, 0.0, vertices); // 8.1
+////		GenerateVert(x - (width / 2), y + (length / 4), height, downTex + 1, 0.0, vertices); // 8.2
+////		downTex += 2.0;
+////	}
+////
+////	GenerateVert(x - (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 13
+////}
+//
+//void AssignIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, int vertSize)
+//{
+//	//std::cout << vertSize << " - verts" << std::endl;
+//
+//	//indices.push_back(vertSize - 11 - (doorCount * 6));
+//	//indices.push_back(vertSize - 12 - (doorCount * 6));
+//	//indices.push_back(vertSize - 13 - (doorCount * 6));
+//	//indices.push_back(vertSize - 13 - (doorCount * 6));
+//	//indices.push_back(vertSize - 14 - (doorCount * 6));
+//	//indices.push_back(vertSize - 11 - (doorCount * 6));
+//
+//	int yWidth = 5 + (4 * doorCount);
+//	int xWidth = (5 + (2 * doorCount));
+//
+//	int val2 = (vertSize - (xWidth * 2 + (doorCount * 2)));
+//
+//	for (int i = 0, j = 0; j < 4; ++i, ++j) // increment j in code
+//	{
+//
+//		if (doors != nullptr && doors[j] == true)
+//		{
+//			DrawDoorIndices(i, yWidth, xWidth, doorCount, j + 1, indices);
+//			i += 2;
+//		}
+//		else
+//		{
+//			DrawQuadIndices(i, yWidth, indices); 
+//		}
+//	}
+//
+//	//indices.push_back(vertSize + 0);
+//	//indices.push_back(vertSize + 1);
+//	//indices.push_back(vertSize + 2);
+//	//indices.push_back(vertSize + 2);
+//	//indices.push_back(vertSize + 3);
+//	//indices.push_back(vertSize + 0);
+//}
 
 void CalculateNormals(vector<unsigned int> &indices, vector<Vertex> &vertices)
 {
@@ -700,65 +705,65 @@ glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
 	return glm::vec3(crossX, crossY, crossZ);
 }
 
-void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices)
-{
-	indices.push_back(val);
-	indices.push_back(val + 1);
-	indices.push_back(val + xWidth + 1);
+//void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices)
+//{
+//	indices.push_back(val);
+//	indices.push_back(val + 1);
+//	indices.push_back(val + xWidth + 1);
+//
+//	indices.push_back(val + xWidth + 1);
+//	indices.push_back(val + xWidth);
+//	indices.push_back(val);
+//}
+//
+//void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices)
+//{
+//	int doorOffset = (2 + (2 * doorCount));
+//
+//	indices.push_back(val);
+//	indices.push_back(val + 1);
+//	indices.push_back(val + yWidth + 1);
+//
+//	indices.push_back(val + yWidth + 1);
+//	indices.push_back(val + yWidth);
+//	indices.push_back(val);
+//
+//	++val;
+//
+//	//Door
+//	//indices.push_back(val);
+//	//indices.push_back(val + 1);
+//	//indices.push_back(val + xWidth - (doorNum - 1));
+//
+//	//indices.push_back(val + xWidth - (doorNum - 1));
+//	//indices.push_back(val + xWidth - doorNum);
+//	//indices.push_back(val);
+//
+//	indices.push_back(val + xWidth - doorNum);
+//	indices.push_back(val + xWidth - (doorNum - 1));
+//	indices.push_back(val + xWidth + doorOffset - 1);
+//
+//	indices.push_back(val + xWidth + doorOffset - 1);
+//	indices.push_back(val + xWidth + doorOffset - 2);
+//	indices.push_back(val + xWidth - doorNum);
+//
+//	++val;
+//
+//	indices.push_back(val);
+//	indices.push_back(val + 1);
+//	indices.push_back(val + yWidth + 1);
+//
+//	indices.push_back(val + yWidth + 1);
+//	indices.push_back(val + yWidth);
+//	indices.push_back(val);
+//}
 
-	indices.push_back(val + xWidth + 1);
-	indices.push_back(val + xWidth);
-	indices.push_back(val);
-}
-
-void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices)
-{
-	int doorOffset = (2 + (2 * doorCount));
-
-	indices.push_back(val);
-	indices.push_back(val + 1);
-	indices.push_back(val + yWidth + 1);
-
-	indices.push_back(val + yWidth + 1);
-	indices.push_back(val + yWidth);
-	indices.push_back(val);
-
-	++val;
-
-	//Door
-	//indices.push_back(val);
-	//indices.push_back(val + 1);
-	//indices.push_back(val + xWidth - (doorNum - 1));
-
-	//indices.push_back(val + xWidth - (doorNum - 1));
-	//indices.push_back(val + xWidth - doorNum);
-	//indices.push_back(val);
-
-	indices.push_back(val + xWidth - doorNum);
-	indices.push_back(val + xWidth - (doorNum - 1));
-	indices.push_back(val + xWidth + doorOffset - 1);
-
-	indices.push_back(val + xWidth + doorOffset - 1);
-	indices.push_back(val + xWidth + doorOffset - 2);
-	indices.push_back(val + xWidth - doorNum);
-
-	++val;
-
-	indices.push_back(val);
-	indices.push_back(val + 1);
-	indices.push_back(val + yWidth + 1);
-
-	indices.push_back(val + yWidth + 1);
-	indices.push_back(val + yWidth);
-	indices.push_back(val);
-}
-
-void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices)
-{
-	Vertex vert = {};
-
-	vert.Position = { x,z,y };
-	vert.TexCoords = { u,v };
-
-	vertices.push_back(vert);
-}
+//void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices)
+//{
+//	Vertex vert = {};
+//
+//	vert.Position = { x,z,y };
+//	vert.TexCoords = { u,v };
+//
+//	vertices.push_back(vert);
+//}
