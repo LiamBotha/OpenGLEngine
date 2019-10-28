@@ -68,11 +68,6 @@ public:
 	// render the mesh
 	void Draw(Shader shader)
 	{
-		//for (int i = 0; i < vertices.size(); ++i)
-		//{
-		//	cout << vertices[i].Normal.x << ", " << vertices[i].Normal.y << ", " << vertices[i].Normal.z << " - Normal" << endl;
-		//}
-
 		// bind appropriate textures
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
@@ -157,6 +152,8 @@ private:
 unsigned int TextureFromFile(const char* path)
 {
 	string filename = string(path);
+
+	stbi_set_flip_vertically_on_load(true);
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);

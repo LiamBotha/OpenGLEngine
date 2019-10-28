@@ -148,7 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
-    <ClInclude Include="LevelGen.h" />
+    <ClInclude Include="levelGeneration.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="room.h" />
@@ -164,6 +164,8 @@
     <Image Include="Textures\img_0.jpg" />
     <Image Include="Textures\img_1.jpg" />
     <Image Include="Textures\img_2.jpg" />
+    <Image Include="Textures\img_3.jpg" />
+    <Image Include="Textures\img_4.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

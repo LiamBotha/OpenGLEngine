@@ -13,7 +13,7 @@ using json = nlohmann::json;
 #include <camera.h>
 #include <mesh.h>
 #include <room.h>
-#include <LevelGen.h>
+#include <levelGeneration.h>
 
 #include <iostream>
 #include <vector>
@@ -29,15 +29,11 @@ string SelectTexture(int texNumber);
 
 //Mesh GenerateMesh(float x, float y, float z, string texturePath);
 //Mesh GenerateRoomMesh(float x, float y, float length, float width, float height, bool doors[], string texturePath);
-Room GenerateRoom(float x, float y, float length, float width, float height, bool doors[], string floorPath, string wallPath, string ceilingPath);
 //void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices);
 //void AssignIndices(bool doors[4], int doorCount, vector<unsigned int> &indices, int vertSize);
 //void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices);
 //void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices);
 //void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices);
-
-void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices);
-glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -108,10 +104,7 @@ int main()
 	// -----------
 	LoadLevelFromFile("level.json");
 
-	//bool doorA[] = { true,false,false,false };
-	//bool doorB[] = { false,false,true,false };
-	//rooms.push_back(GenerateRoom(0, 0, 5, 2, 2, doorA, "Textures/awesomeface.png","Textures/container.jpg", "Textures/awesomeface.png"));
-	//rooms.push_back(GenerateRoom(0, 6, 5, 2, 2, doorB, "Textures/awesomeface.png","Textures/container.jpg", "Textures/awesomeface.png"));
+	Mesh lightMesh = GenerateCube(0.0f, 0.5f, 0.0f);
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -145,7 +138,7 @@ int main()
 		lightingShader.setVec3("viewPos", camera.Position);
 
 		// light properties
-		lightingShader.setVec3("light.ambient", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("light.ambient", 0.8f, 0.8f, 0.8f);
 		lightingShader.setVec3("light.diffuse", 0.2f, 0.2f, 0.2f);
 		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
@@ -169,6 +162,12 @@ int main()
 		{
 			rooms[i].Draw(lightingShader);
 		}
+
+		ourShader.use();
+		ourShader.setMat4("projection", projection);
+		ourShader.setMat4("view", view);
+		ourShader.setMat4("model", model);
+		lightMesh.Draw(ourShader);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -424,77 +423,6 @@ string SelectTexture(int texNumber)
 //	return Mesh(vertices, indices, textures);
 //}
 
-Room GenerateRoom(float x, float y, float length, float width, float height, bool doors[],string floorPath, string wallPath,string ceilingPath)
-{
-	int doorCount = 0;
-	for (int i = 0; i < 4; ++i)
-	{
-		if (doors[i] == true)
-		{
-			++doorCount;
-		}
-	}
-
-	vector<Vertex> floorVertices = {};
-	vector<unsigned int> floorIndices = {};
-	vector<Texture> floorTextures = {};
-
-	vector<Vertex> wallVertices = {};
-	vector<unsigned int> wallIndices = {};
-	vector<Texture> wallTextures = {};
-
-	vector<Vertex> ceilingVertices = {};
-	vector<unsigned int> ceilingIndices = {};
-	vector<Texture> ceilingTextures = {};
-
-	Texture floorTex = LoadTexture(floorPath.c_str(), "texture_diffuse");
-	floorTextures.push_back(floorTex);
-
-	Texture wallTex = LoadTexture(wallPath.c_str(), "texture_diffuse");
-	wallTextures.push_back(wallTex);
-
-	Texture ceilingTex = LoadTexture(ceilingPath.c_str(), "texture_diffuse");
-	ceilingTextures.push_back(ceilingTex);
-
-	int texCoordWidth = (1 * width / 2);
-	int texCoordLength = (1 * length / 2);
-
-	GenerateVert(x - (width / 2), y + (length / 2), 0, 0.0, texCoordLength, floorVertices); // 0
-	GenerateVert(x + (width / 2), y + (length / 2), 0, texCoordWidth, texCoordLength, floorVertices); // 1
-	GenerateVert(x + (width / 2), y - (length / 2), 0, texCoordWidth, 0.0, floorVertices); // 2
-	GenerateVert(x - (width / 2), y - (length / 2), 0, 0.0, 0.0, floorVertices); // 3
-
-	GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, texCoordLength, ceilingVertices); // 0
-	GenerateVert(x + (width / 2), y + (length / 2), height, texCoordWidth, texCoordLength, ceilingVertices); // 1
-	GenerateVert(x + (width / 2), y - (length / 2), height, texCoordWidth, 0.0, ceilingVertices); // 2
-	GenerateVert(x - (width / 2), y - (length / 2), height, 0.0, 0.0, ceilingVertices); // 3
-
-	floorIndices.push_back(0);
-	floorIndices.push_back(3);
-	floorIndices.push_back(2);
-	floorIndices.push_back(2);
-	floorIndices.push_back(1);
-	floorIndices.push_back(0);
-
-	ceilingIndices.push_back(0);
-	ceilingIndices.push_back(1);
-	ceilingIndices.push_back(2);
-	ceilingIndices.push_back(2);
-	ceilingIndices.push_back(3);
-	ceilingIndices.push_back(0);
-
-	//BuildWalls(x, y, length, width, height, doors, doorCount, wallVertices);
-	//AssignIndices(doors, doorCount, wallIndices, wallVertices.size());
-	BuildNormalWalls(x, y, length, width, height, doors, wallVertices);
-	AssignNewIndices(doors, doorCount, wallIndices, wallVertices.size());
-
-	CalculateNormals(wallIndices, wallVertices);
-	CalculateNormals(floorIndices, floorVertices);
-	CalculateNormals(ceilingIndices, ceilingVertices);
-
-	return Room(Mesh(floorVertices,floorIndices,floorTextures), Mesh(wallVertices, wallIndices, wallTextures), Mesh(ceilingVertices, ceilingIndices, ceilingTextures));
-}
-
 ////void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices)
 ////{
 ////	int downTex = 0;
@@ -661,49 +589,6 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 //	//indices.push_back(vertSize + 3);
 //	//indices.push_back(vertSize + 0);
 //}
-
-void CalculateNormals(vector<unsigned int> &indices, vector<Vertex> &vertices)
-{
-	for (int i = 0; i < indices.size(); i += 3)
-	{
-		Vertex vert1 = vertices[indices[i]];
-		Vertex vert2 = vertices[indices[i + 1]];
-		Vertex vert3 = vertices[indices[i + 2]];
-
-		//cout << vert1.Position.x << "," << vert2.Position.x << "," << vert3.Position.x << " X pos" << endl;
-
-		glm::vec3 edgeA = vert1.Position - vert2.Position;
-		glm::vec3 edgeB = vert1.Position - vert3.Position;
-
-		glm::vec3 normal = CrossProduct(edgeA, edgeB);
-
-		vertices[indices[i]].Normal = normal;
-		vertices[indices[i + 1]].Normal = normal;
-		vertices[indices[i + 2]].Normal = normal;
-
-		//cout << edgeA.x << "," << edgeA.y << "," << edgeA.z << " - Edge A" << endl;
-		//cout << edgeB.x << "," << edgeB.y << "," << edgeB.z << " - Edge B" << endl;
-	}
-
-	for (int i = 0; i < vertices.size(); ++i)
-	{
-		vertices[i].Normal = glm::normalize(vertices[i].Normal);
-	}
-}
-
-glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
-{
-	int crossX = (a.y * b.z) - (a.z * b.y);
-	int crossY = (a.x * b.z) - (a.z * b.x);
-	int crossZ = (a.x * b.y) - (a.y * b.x);
-
-	//cout << crossX;
-	//cout << crossY;
-	//cout << crossZ;
-	//cout << endl;;
-
-	return glm::vec3(crossX, crossY, crossZ);
-}
 
 //void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices)
 //{

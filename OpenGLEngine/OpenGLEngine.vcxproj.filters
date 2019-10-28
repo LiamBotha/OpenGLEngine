@@ -47,7 +47,7 @@
     <ClInclude Include="room.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelGen.h">
+    <ClInclude Include="levelGeneration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -73,6 +73,12 @@
       <Filter>Textures</Filter>
     </Image>
     <Image Include="Textures\img_0.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_3.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_4.jpg">
       <Filter>Textures</Filter>
     </Image>
   </ItemGroup>

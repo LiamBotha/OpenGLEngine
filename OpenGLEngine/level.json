@@ -5,8 +5,8 @@
       "Length": 7,
       "Width": 2,
       "Height": 4,
-      "FloorTexture": 1,
-      "WallTexture": 2,
+      "FloorTexture": 8,
+      "WallTexture": 12,
       "CeilingTexture": 1,
       "Doors": [ true, false, false, true ]
     },
