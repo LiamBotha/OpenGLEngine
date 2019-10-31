@@ -101,6 +101,7 @@ int main()
 	// -------------------------
 	Shader ourShader("shader.vs", "shader.fs");
 	Shader lightingShader("lightShader.vert", "lightShader.frag");
+	Shader lightObjShader("light.vert", "light.frag");
 
 	// load models
 	// -----------
@@ -156,10 +157,10 @@ int main()
 		lightingShader.setFloat("material.shininess", 10.0f);
 
 		// directional light
-		//lightingShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
-		//lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-		//lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-		//lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+		lightingShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
+		lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+		lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+		lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
 		// view/projection tranansformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -185,15 +186,15 @@ int main()
 			spotLights[i].RenderLight(i , lightingShader);
 		}
 
-		ourShader.use();
-		ourShader.setMat4("projection", projection);
-		ourShader.setMat4("view", view);
-		ourShader.setMat4("model", model);
+		lightObjShader.use();
+		lightObjShader.setMat4("projection", projection);
+		lightObjShader.setMat4("view", view);
+		lightObjShader.setMat4("model", model);
 		//lightMesh.Draw(ourShader);
 
 		for (int i = 0; i < pointMeshes.size(); i++)
 		{
-			pointMeshes[i].Draw(ourShader);
+			pointMeshes[i].Draw(lightObjShader);
 		}
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -386,6 +387,11 @@ void LoadLevelFromFile(string levelPath)
 			float lightY = 0;
 			float lightZ = 0;
 
+			int lightType = 0;
+
+			if (!light["Type"].is_null())
+				lightType = light["Type"];
+
 			if (!light["Position"][0].is_null())
 				lightX = light["Position"][0];
 			if (!light["Position"][1].is_null())
@@ -394,7 +400,10 @@ void LoadLevelFromFile(string levelPath)
 				lightZ = light["Position"][2];
 
 
-			pointLights[i] = Light({ lightX,lightY,lightZ });
+			if (lightType == 0)
+				pointLights[i] = Light({ lightX,lightY,lightZ }, { 0,0,0 });
+			else if(lightType == 1)
+				spotLights[i] = Light({ lightX,lightY,lightZ }, {0,0,0}, 1);
 
 			cout << pointLights[i].position.x << "," << pointLights[i].position.y << "," << pointLights[i].position.z << endl;
 

@@ -3,7 +3,7 @@
     {
       "Position": [ 0, 0, 0 ],
       "Length": 7,
-      "Width": 2,
+      "Width": 5,
       "Height": 4,
       "FloorTexture": 8,
       "WallTexture": 12,
@@ -13,7 +13,7 @@
     {
       "Position": [ 0, 6, 0 ],
       "Length": 5,
-      "Width": 2,
+      "Width": 3,
       "Height": 3,
       "FloorTexture": 1,
       "WallTexture": 0,
@@ -30,14 +30,14 @@
   ],
   "Lights": [
     {
-      "Type": 0,
+      "Type": 1,
       "Color": [ 0, 0, 0 ],
-      "Position": [ 0, 2, 0 ]
+      "Position": [ 0, 4, 0 ]
     },
     {
       "Type": 0,
       "Color": [ 0, 0, 0 ],
-      "Position": [ 0, 2, 5 ]
+      "Position": [ 0, 2, 7 ]
     }
   ] 
 }

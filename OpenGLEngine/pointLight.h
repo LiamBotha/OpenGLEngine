@@ -50,8 +50,8 @@ public:
 
 		if (type == 1)
 		{
-			cutOff = cos(glm::radians(12.5f));
-			outerCutOff = cos(glm::radians(15.0f));
+			cutOff = cos(glm::radians(30.0f));
+			outerCutOff = cos(glm::radians(35.0f));
 		}
 	}
 
@@ -74,7 +74,7 @@ public:
 
 		if (type == 1)
 		{
-			shader.setVec3(pointLight + ".direction", vec3(0,1,0));
+			shader.setVec3(pointLight + ".direction", vec3(0,-1,0));
 			shader.setFloat(pointLight + ".cutOff", cutOff);
 			shader.setFloat(pointLight + ".outerCutOff", outerCutOff);
 		}

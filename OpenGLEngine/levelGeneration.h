@@ -269,6 +269,7 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	width -= 0.001f;
 
 	int lengthFinal = (length / 2);
+	int widthFinal = 1.0 * width / 2;
 	int topHeightTex = 1 * height / 2;
 	float middleTexHeight = 0.667 * topHeightTex;
 
@@ -277,10 +278,10 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	GenerateVert(x - (width / 2), y + (length / 2), 0, 0, 0.0, vertices);
 	if (doors[0] == true)
 	{
-		GenerateVert(x - (width / 4), y + (length / 2), 0, 0.25 * width / 2, 0.0, vertices); // 5.1
-		GenerateVert(x + (width / 4), y + (length / 2), 0, 0.75 * width / 2, 0.0, vertices); // 5.2
+		GenerateVert(x - (width / 4), y + (length / 2), 0, 0.25 * widthFinal, 0.0, vertices); // 5.1
+		GenerateVert(x + (width / 4), y + (length / 2), 0, 0.75 * widthFinal, 0.0, vertices); // 5.2
 	}
-	GenerateVert(x + (width / 2), y + (length / 2), 0, 1.0 * width / 2, 0.0, vertices);
+	GenerateVert(x + (width / 2), y + (length / 2), 0, widthFinal, 0.0, vertices);
 
 	//Wall B
 	GenerateVert(x + (width / 2), y + (length / 2), 0, 0, 0.0, vertices);
@@ -295,10 +296,10 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	GenerateVert(x + (width / 2), y - (length / 2), 0, 0.0, 0.0, vertices);
 	if (doors[2] == true)
 	{
-		GenerateVert(x + (width / 4), y - (length / 2), 0, 0.25 * width / 2, 0.0, vertices); // 5.1
-		GenerateVert(x - (width / 4), y - (length / 2), 0, 0.75 * width / 2, 0.0, vertices); // 5.2
+		GenerateVert(x + (width / 4), y - (length / 2), 0, 0.25 * widthFinal, 0.0, vertices); // 5.1
+		GenerateVert(x - (width / 4), y - (length / 2), 0, 0.75 * widthFinal, 0.0, vertices); // 5.2
 	}
-	GenerateVert(x - (width / 2), y - (length / 2), 0, 1.0 * width / 2, 0.0, vertices);
+	GenerateVert(x - (width / 2), y - (length / 2), 0, widthFinal, 0.0, vertices);
 
 	//Wall D
 	GenerateVert(x - (width / 2), y - (length / 2), 0, 0.0, 0.0, vertices);
@@ -313,8 +314,8 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	//Middle
 	if (doors[0] == true)
 	{
-		GenerateVert(x - (width / 4), y + (length / 2), (height / 1.5), 0.25 * width / 2, middleTexHeight, vertices);
-		GenerateVert(x + (width / 4), y + (length / 2), (height / 1.5), 0.75 * width / 2, middleTexHeight, vertices);
+		GenerateVert(x - (width / 4), y + (length / 2), (height / 1.5), 0.25 * widthFinal, middleTexHeight, vertices);
+		GenerateVert(x + (width / 4), y + (length / 2), (height / 1.5), 0.75 * widthFinal, middleTexHeight, vertices);
 	}
 	if (doors[1] == true)
 	{
@@ -323,8 +324,8 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	}
 	if (doors[2] == true)
 	{
-		GenerateVert(x + (width / 4), y - (length / 2), (height / 1.5), 0.25 * width / 2, middleTexHeight, vertices);
-		GenerateVert(x - (width / 4), y - (length / 2), (height / 1.5), 0.75 * width / 2, middleTexHeight, vertices);
+		GenerateVert(x + (width / 4), y - (length / 2), (height / 1.5), 0.25 * widthFinal, middleTexHeight, vertices);
+		GenerateVert(x - (width / 4), y - (length / 2), (height / 1.5), 0.75 * widthFinal, middleTexHeight, vertices);
 	}
 	if (doors[3] == true)
 	{
@@ -338,10 +339,10 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, topHeightTex, vertices);
 	if (doors[0] == true)
 	{
-		GenerateVert(x - (width / 4), y + (length / 2), height, 0.25 * width / 2, topHeightTex, vertices); // 5.1
-		GenerateVert(x + (width / 4), y + (length / 2), height, 0.75 * width / 2, topHeightTex, vertices); // 5.2
+		GenerateVert(x - (width / 4), y + (length / 2), height, 0.25 * widthFinal, topHeightTex, vertices); // 5.1
+		GenerateVert(x + (width / 4), y + (length / 2), height, 0.75 * widthFinal, topHeightTex, vertices); // 5.2
 	}
-	GenerateVert(x + (width / 2), y + (length / 2), height, 1 * width / 2, topHeightTex, vertices);
+	GenerateVert(x + (width / 2), y + (length / 2), height, widthFinal, topHeightTex, vertices);
 	
 	//Wall B
 	GenerateVert(x + (width / 2), y + (length / 2), height, 0.0, topHeightTex, vertices);
@@ -356,10 +357,10 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	GenerateVert(x + (width / 2), y - (length / 2), height, 0.0, topHeightTex, vertices);
 	if (doors[2] == true)
 	{
-		GenerateVert(x + (width / 4), y - (length / 2), height, 0.25 * width / 2, topHeightTex, vertices); // 5.1
-		GenerateVert(x - (width / 4), y - (length / 2), height, 0.75 * width / 2, topHeightTex, vertices); // 5.2
+		GenerateVert(x + (width / 4), y - (length / 2), height, 0.25 * widthFinal, topHeightTex, vertices); // 5.1
+		GenerateVert(x - (width / 4), y - (length / 2), height, 0.75 * widthFinal, topHeightTex, vertices); // 5.2
 	}
-	GenerateVert(x - (width / 2), y - (length / 2), height, 1 * width / 2, topHeightTex, vertices);
+	GenerateVert(x - (width / 2), y - (length / 2), height, widthFinal, topHeightTex, vertices);
 	
 	//Wall D
 	GenerateVert(x - (width / 2), y - (length / 2), height, 0.0, topHeightTex, vertices);
@@ -458,8 +459,6 @@ void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices, b
 		Vertex vert2 = vertices[indices[j]];
 		Vertex vert3 = vertices[indices[k]];
 
-		//cout << vert1.Position.x << "," << vert2.Position.x << "," << vert3.Position.x << " X pos" << endl;
-
 		glm::vec3 edgeA = vert1.Position - vert2.Position;
 		glm::vec3 edgeB = vert1.Position - vert3.Position;
 
@@ -474,23 +473,12 @@ void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices, b
 		vertices[indices[i]].Normal = normal;
 		vertices[indices[j]].Normal = normal;
 		vertices[indices[k]].Normal = normal;
-
-		//cout << edgeA.x << "," << edgeA.y << "," << edgeA.z << " - Edge A " << i << endl;
-		//cout << edgeB.x << "," << edgeB.y << "," << edgeB.z << " - Edge B " << i << endl;
-
-		//cout << normal.x << ", " << normal.y << ", " << normal.z << " Normal " << i << endl;
 	}
 
 	for (int i = 0; i < vertices.size(); ++i)
 	{
-		//cout << vertices[i].Normal.x << ", " << vertices[i].Normal.y << ", " << vertices[i].Normal.z << " Normal " << i << endl;
-
 		vertices[i].Normal = glm::normalize(vertices[i].Normal);
-
-		cout << vertices[i].Normal.x << ", " << vertices[i].Normal.y << ", " << vertices[i].Normal.z << " Normal " << i << endl;
 	}
-
-	cout << "finished room normals" << endl;
 }
 
 glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
@@ -498,11 +486,6 @@ glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
 	float crossX = (a.y * b.z) - (a.z * b.y);
 	float crossY = (a.x * b.z) - (a.z * b.x);
 	float crossZ = (a.x * b.y) - (a.y * b.x);
-
-	//cout << crossX;
-	//cout << crossY;
-	//cout << crossZ;
-	//cout << endl;;
 
 	return glm::vec3(crossX, crossY, crossZ);
 }
