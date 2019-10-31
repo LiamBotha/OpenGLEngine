@@ -18,26 +18,28 @@
       "FloorTexture": 1,
       "WallTexture": 0,
       "CeilingTexture": 1,
-      "Doors": [ true, false, false, false ]
+      "Doors": [ true, false, true, false ]
     }
   ],
   "Models" :[
     {
       "ObjectID": 1,
       "Position": [ 0, 0, 0 ],
-      "Rotation": {}
+      "Rotation": [ 0, 0, 0 ]
     }
   ],
   "Lights": [
     {
       "Type": 1,
-      "Color": [ 0, 0, 0 ],
       "Position": [ 0, 4, 0 ]
     },
     {
       "Type": 0,
-      "Color": [ 0, 0, 0 ],
       "Position": [ 0, 2, 7 ]
+    },
+    {
+      "Type": 2,
+      "Direction": [ 0, -2, 0 ]
     }
   ] 
 }

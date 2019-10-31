@@ -53,6 +53,7 @@ float lastFrame = 0.0f;
 
 // lighting
 //glm::vec3 lightPos(0.0f, 0.5f, 0.0f);
+Light directionalLight = Light({ 0,0,0 }, { 0.0f, -1.0f, 0.0f }, 2);
 
 vector<Room> rooms = {};
 vector<Light> pointLights = {};
@@ -107,8 +108,6 @@ int main()
 	// -----------
 	LoadLevelFromFile("level.json");
 
-	//Mesh lightMesh = GenerateCube(0.0f, 0.5f, 0.0f);
-
 	// positions of the point lights
 	glm::vec3 pointLightPositions[] = {
 		glm::vec3(0.0f,  1.0f,  2.0f),
@@ -116,10 +115,6 @@ int main()
 		glm::vec3(0.0f,  1.0f, 0.0f),
 		glm::vec3(0.0f,  1.0f, -3.0f)
 	};
-
-	//pointMeshes.push_back(GenerateCube(2.3f, -3.3f, -4.0f));
-	//pointMeshes.push_back(GenerateCube(0.0f, 1.0f, 0.0f));
-	//pointMeshes.push_back(GenerateCube(0.0f, 1.0f, -3.0f));
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -154,13 +149,13 @@ int main()
 		//ourShader.use();
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", camera.Position);
-		lightingShader.setFloat("material.shininess", 10.0f);
+		lightingShader.setFloat("material.shininess", 15.0f);
 
 		// directional light
-		lightingShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
-		lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-		lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-		lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+		//lightingShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
+		//lightingShader.setVec3("dirLight.ambient", 0.08f, 0.08f, 0.08f);
+		//lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+		//lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
 		// view/projection tranansformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -178,6 +173,8 @@ int main()
 		{			
 			rooms[i].Draw(lightingShader);
 		}
+
+		directionalLight.RenderLight(0, lightingShader);
 
 		for (int i = 0; i < pointLights.size(); i++)
 		{
@@ -392,22 +389,46 @@ void LoadLevelFromFile(string levelPath)
 			if (!light["Type"].is_null())
 				lightType = light["Type"];
 
-			if (!light["Position"][0].is_null())
-				lightX = light["Position"][0];
-			if (!light["Position"][1].is_null())
-				lightY = light["Position"][1];
-			if (!light["Position"][2].is_null())
-				lightZ = light["Position"][2];
+			if (lightType == 2)
+			{
+				float dirX = 0;
+				float dirY = 0;
+				float dirZ = 0;
 
+				if (!light["Direction"][0].is_null())
+				{
+					dirX = light["Direction"][0];
+				}
+				if (!light["Direction"][1].is_null())
+				{
+					dirY = light["Direction"][1];
+				}
+				if (!light["Direction"][2].is_null())
+				{
+					dirZ = light["Direction"][2];
+				}
 
-			if (lightType == 0)
-				pointLights[i] = Light({ lightX,lightY,lightZ }, { 0,0,0 });
-			else if(lightType == 1)
-				spotLights[i] = Light({ lightX,lightY,lightZ }, {0,0,0}, 1);
+				directionalLight = Light({0,0,0}, {dirX,dirY,dirZ}, 2);
+			}
+			else
+			{
 
-			cout << pointLights[i].position.x << "," << pointLights[i].position.y << "," << pointLights[i].position.z << endl;
+				if (!light["Position"][0].is_null())
+					lightX = light["Position"][0];
+				if (!light["Position"][1].is_null())
+					lightY = light["Position"][1];
+				if (!light["Position"][2].is_null())
+					lightZ = light["Position"][2];
 
-			pointMeshes.push_back(GenerateCube(lightX,lightY, lightZ));
+				if (lightType == 0)
+					pointLights[i] = Light({ lightX,lightY,lightZ }, { 0,0,0 });
+				else if (lightType == 1)
+					spotLights[i] = Light({ lightX,lightY,lightZ }, { 0,0,0 }, 1);
+
+				cout << pointLights[i].position.x << "," << pointLights[i].position.y << "," << pointLights[i].position.z << endl;
+
+				pointMeshes.push_back(GenerateCube(lightX, lightY, lightZ));
+			}
 		}
 	}
 }
