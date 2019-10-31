@@ -14,10 +14,12 @@ using json = nlohmann::json;
 #include <mesh.h>
 #include <room.h>
 #include <levelGeneration.h>
+#include <pointLight.h>
 
 #include <iostream>
 #include <vector>
 #include <array>
+#include <algorithm>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -50,9 +52,12 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(0.0f, 0.5f, 0.0f);
+//glm::vec3 lightPos(0.0f, 0.5f, 0.0f);
 
 vector<Room> rooms = {};
+vector<Light> pointLights = {};
+vector<Light> spotLights = {};
+vector<Mesh> pointMeshes = {};
 
 int main()
 {
@@ -95,22 +100,35 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader ourShader("shader.vs", "shader.fs");
-	Shader lightingShader("lightShader.vs", "lightShader.fs");
-
-	lightingShader.use();
-	lightingShader.setInt("material.diffuse", 0);
+	Shader lightingShader("lightShader.vert", "lightShader.frag");
 
 	// load models
 	// -----------
 	LoadLevelFromFile("level.json");
 
-	Mesh lightMesh = GenerateCube(0.0f, 0.5f, 0.0f);
+	//Mesh lightMesh = GenerateCube(0.0f, 0.5f, 0.0f);
+
+	// positions of the point lights
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3(0.0f,  1.0f,  2.0f),
+		glm::vec3(2.3f, -3.3f, -4.0f),
+		glm::vec3(0.0f,  1.0f, 0.0f),
+		glm::vec3(0.0f,  1.0f, -3.0f)
+	};
+
+	//pointMeshes.push_back(GenerateCube(2.3f, -3.3f, -4.0f));
+	//pointMeshes.push_back(GenerateCube(0.0f, 1.0f, 0.0f));
+	//pointMeshes.push_back(GenerateCube(0.0f, 1.0f, -3.0f));
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
+
+	lightingShader.use();
+	lightingShader.setInt("material.diffuse", 0);
+	lightingShader.setInt("material.specular", 1);
 
 	// render loop
 	// -----------
@@ -134,17 +152,14 @@ int main()
 		// don't forget to enable shader before setting uniforms
 		//ourShader.use();
 		lightingShader.use();
-		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
+		lightingShader.setFloat("material.shininess", 10.0f);
 
-		// light properties
-		lightingShader.setVec3("light.ambient", 0.8f, 0.8f, 0.8f);
-		lightingShader.setVec3("light.diffuse", 0.2f, 0.2f, 0.2f);
-		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-		// material properties
-		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		lightingShader.setFloat("material.shininess", 40.0f);
+		// directional light
+		//lightingShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
+		//lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+		//lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+		//lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
 		// view/projection tranansformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -159,15 +174,27 @@ int main()
 		lightingShader.setMat4("model", model);
 
 		for (int i = 0; i < rooms.size(); ++i)
-		{
+		{			
 			rooms[i].Draw(lightingShader);
+		}
+
+		for (int i = 0; i < pointLights.size(); i++)
+		{
+			pointLights[i].RenderLight(i , lightingShader);
+
+			spotLights[i].RenderLight(i , lightingShader);
 		}
 
 		ourShader.use();
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
 		ourShader.setMat4("model", model);
-		lightMesh.Draw(ourShader);
+		//lightMesh.Draw(ourShader);
+
+		for (int i = 0; i < pointMeshes.size(); i++)
+		{
+			pointMeshes[i].Draw(ourShader);
+		}
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -320,6 +347,8 @@ void LoadLevelFromFile(string levelPath)
 
 			cout << roomX << ", " << roomY << ", " << roomZ << endl;
 
+			cout << height << " room height" << endl;
+
 			rooms.push_back(GenerateRoom(roomX, roomY, length, width, height, doors, floorPath, wallPath, ceilingPath));
 		}
 	}
@@ -334,13 +363,42 @@ void LoadLevelFromFile(string levelPath)
 		}
 	}
 
+	for (int i = 0; i < 20; ++i)
+	{
+		pointLights.push_back(Light());
+
+		spotLights.push_back(Light(1));
+	}
+
 	if (!jsonObj["Lights"].is_null())
 	{
 		numRooms = jsonObj["Lights"].size();
 
+		numRooms = std::min(numRooms, 20);
+
+		cout << jsonObj["Lights"].size() << " Number of Lights";
+
 		for (int i = 0; i < numRooms; ++i)
 		{
+			json light = jsonObj["Lights"][i];
 
+			float lightX = 0;
+			float lightY = 0;
+			float lightZ = 0;
+
+			if (!light["Position"][0].is_null())
+				lightX = light["Position"][0];
+			if (!light["Position"][1].is_null())
+				lightY = light["Position"][1];
+			if (!light["Position"][2].is_null())
+				lightZ = light["Position"][2];
+
+
+			pointLights[i] = Light({ lightX,lightY,lightZ });
+
+			cout << pointLights[i].position.x << "," << pointLights[i].position.y << "," << pointLights[i].position.z << endl;
+
+			pointMeshes.push_back(GenerateCube(lightX,lightY, lightZ));
 		}
 	}
 }

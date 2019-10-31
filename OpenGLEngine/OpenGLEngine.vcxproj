@@ -149,14 +149,15 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="levelGeneration.h" />
+    <ClInclude Include="pointLight.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="lightShader.fs" />
-    <None Include="lightShader.vs" />
+    <None Include="lightShader.frag" />
+    <None Include="lightShader.vert" />
     <None Include="shader.fs" />
     <None Include="shader.vs" />
   </ItemGroup>

@@ -8,7 +8,6 @@
 using namespace glm;
 
 void BuildNormalWalls(float x, float y, float length, float width, float height, bool doors[4], vector<Vertex>& vertices);
-void BuildDoor();
 
 Room GenerateRoom(float x, float y, float length, float width, float height, bool doors[], string floorPath, string wallPath, string ceilingPath);
 
@@ -17,7 +16,7 @@ void DrawQuadIndices(int val, int xWidth, vector<unsigned int>& indices);
 void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int>& indices);
 void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex>& vertices);
 
-void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices);
+void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices, bool flipNormal = false);
 glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b);
 
 
@@ -57,6 +56,93 @@ Mesh GenerateCube(float x, float y, float z)
 		{vec3(x+0.5f, y-0.5f, z+0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 1.0f),   vec3(0.0f, -1.0f, 0.0f)}, // Bottom Bottom Right (21)
 		{vec3(x+0.5f, y-0.5f, z-0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 0.0f),   vec3(0.0f, -1.0f, 0.0f)}, // Bottom Top Right (22)
 		{vec3(x-0.5f, y-0.5f, z-0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 0.0f),   vec3(0.0f, -1.0f, 0.0f)}  // Bottom Top Left (23)*/
+	};
+
+	cubeIndices.push_back(0);
+	cubeIndices.push_back(1);
+	cubeIndices.push_back(2);
+	cubeIndices.push_back(2);
+	cubeIndices.push_back(3);
+	cubeIndices.push_back(0);
+
+	cubeIndices.push_back(4);
+	cubeIndices.push_back(7);
+	cubeIndices.push_back(6);
+	cubeIndices.push_back(6);
+	cubeIndices.push_back(5);
+	cubeIndices.push_back(4);
+
+	cubeIndices.push_back(8);
+	cubeIndices.push_back(9);
+	cubeIndices.push_back(10);
+	cubeIndices.push_back(10);
+	cubeIndices.push_back(11);
+	cubeIndices.push_back(8);
+
+	cubeIndices.push_back(12);
+	cubeIndices.push_back(13);
+	cubeIndices.push_back(14);
+	cubeIndices.push_back(14);
+	cubeIndices.push_back(15);
+	cubeIndices.push_back(12);
+
+	cubeIndices.push_back(16);
+	cubeIndices.push_back(17);
+	cubeIndices.push_back(18);
+	cubeIndices.push_back(18);
+	cubeIndices.push_back(19);
+	cubeIndices.push_back(16);
+
+	cubeIndices.push_back(20);
+	cubeIndices.push_back(21);
+	cubeIndices.push_back(22);
+	cubeIndices.push_back(22);
+	cubeIndices.push_back(23);
+	cubeIndices.push_back(20);
+
+	return Mesh(cubeVertices, cubeIndices, {});
+}
+
+Mesh GenerateCube(vec3 position)
+{
+	float x = position.x;
+	float y = position.y;
+	float z = position.z;
+
+	vector<Vertex> cubeVerts = {};
+	vector<unsigned int> cubeIndices = {};
+
+	vector<Vertex> cubeVertices = {
+		//position					 color					   uv				   normal
+		{vec3(x - 0.5f, y - 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 1.0f),   vec3(0.0f, 0.0f, -1.0f)}, // Front Bottom Left (0)
+		{vec3(x + 0.5f, y - 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 1.0f),   vec3(0.0f, 0.0f, -1.0f)}, // Front Bottom Right (1)
+		{vec3(x + 0.5f, y + 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 0.0f),   vec3(0.0f, 0.0f, -1.0f)}, // Front Top Right (2)
+		{vec3(x - 0.5f, y + 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 0.0f),   vec3(0.0f, 0.0f, -1.0f)}, // Front Top Left (3)
+
+		{vec3(x - 0.5f, y - 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 1.0f),   vec3(0.0f, 0.0f, 1.0f)},  // Back Bottom Left (4)
+		{vec3(x + 0.5f, y - 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 1.0f),   vec3(0.0f, 0.0f, 1.0f)},  // Back Bottom Right (5)
+		{vec3(x + 0.5f, y + 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 0.0f),   vec3(0.0f, 0.0f, 1.0f)},  // Back Top Right (6)
+		{vec3(x - 0.5f, y + 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 0.0f),   vec3(0.0f, 0.0f, 1.0f)},  // Back Top Left (7)
+
+		{vec3(x - 0.5f, y - 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 1.0f),   vec3(-1.0f, 0.0f, 0.0f)}, // Left Bottom Left (8)
+		{vec3(x - 0.5f, y - 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 1.0f),   vec3(-1.0f, 0.0f, 0.0f)}, // Left Bottom Right (9)
+		{vec3(x - 0.5f, y + 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 0.0f),   vec3(-1.0f, 0.0f, 0.0f)}, // Left Top Right (10)
+		{vec3(x - 0.5f, y + 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 0.0f),   vec3(-1.0f, 0.0f, 0.0f)}, // Left Top Left (11)
+
+		{vec3(x + 0.5f, y - 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 1.0f),   vec3(1.0f, 0.0f, 0.0f)},  // Right Bottom Left (12)
+		{vec3(x + 0.5f, y - 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 1.0f),   vec3(1.0f, 0.0f, 0.0f)},  // Right Bottom Right (13)
+		{vec3(x + 0.5f, y + 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 0.0f),   vec3(1.0f, 0.0f, 0.0f)},  // Right Top Right (14)
+		{vec3(x + 0.5f, y + 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 0.0f),   vec3(1.0f, 0.0f, 0.0f)},  // Right Top Left (15)
+
+		{vec3(x - 0.5f, y + 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 1.0f),   vec3(0.0f, 1.0f, 0.0f)},  // Top Bottom Left (16)
+		{vec3(x + 0.5f, y + 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 1.0f),   vec3(0.0f, 1.0f, 0.0f)},  // Top Bottom Right (17)
+		{vec3(x + 0.5f, y + 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 0.0f),   vec3(0.0f, 1.0f, 0.0f)},  // Top Top Right (18)
+		{vec3(x - 0.5f, y + 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 0.0f),   vec3(0.0f, 1.0f, 0.0f)},  // Top Top Left (19)
+
+		{vec3(x - 0.5f, y - 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 1.0f),   vec3(0.0f, -1.0f, 0.0f)}, // Bottom Bottom Left (20)
+		{vec3(x + 0.5f, y - 0.5f, z + 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 1.0f),   vec3(0.0f, -1.0f, 0.0f)}, // Bottom Bottom Right (21)
+		{vec3(x + 0.5f, y - 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(0.0f, 0.0f),   vec3(0.0f, -1.0f, 0.0f)}, // Bottom Top Right (22)
+		{vec3(x - 0.5f, y - 0.5f, z - 0.5f),  vec3(1.0f, 1.0f, 1.0f),   vec2(1.0f, 0.0f),   vec3(0.0f, -1.0f, 0.0f)}  // Bottom Top Left (23)*/
 	};
 
 	cubeIndices.push_back(0);
@@ -168,16 +254,24 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 	BuildNormalWalls(x, y, length, width, height, doors, wallVertices);
 	AssignNewIndices(doors, doorCount, wallIndices, wallVertices.size());
 
-	CalculateNormals(wallIndices, wallVertices);
+	CalculateNormals(wallIndices, wallVertices, true);
 	CalculateNormals(floorIndices, floorVertices);
 	CalculateNormals(ceilingIndices, ceilingVertices);
 
-	return Room(Mesh(floorVertices, floorIndices, floorTextures), Mesh(wallVertices, wallIndices, wallTextures), Mesh(ceilingVertices, ceilingIndices, ceilingTextures));
+	vec3 pos = { x,0,y};
+
+	return Room(pos, Mesh(floorVertices, floorIndices, floorTextures), Mesh(wallVertices, wallIndices, wallTextures), Mesh(ceilingVertices, ceilingIndices, ceilingTextures));
 }
 
 void BuildNormalWalls(float x, float y,float length, float width, float height, bool doors[4], vector<Vertex> &vertices)
 {
+	length -= 0.001f;
+	width -= 0.001f;
+
 	int lengthFinal = (length / 2);
+	int topHeightTex = 1 * height / 2;
+	float middleTexHeight = 0.667 * topHeightTex;
+
 	//Bottom
 	//Wall A
 	GenerateVert(x - (width / 2), y + (length / 2), 0, 0, 0.0, vertices);
@@ -215,9 +309,6 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	}
 	GenerateVert(x - (width / 2), y + (length / 2), 0, (int)(1 * length / 2), 0.0, vertices);
 
-
-	float middleTexHeight = 0.667 * height / 2;
-
 	cout << middleTexHeight << " middle height texture" << endl;
 	//Middle
 	if (doors[0] == true)
@@ -242,7 +333,7 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	}
 
 	//Top
-	int topHeightTex = 1 * height / 2;
+	cout << topHeightTex << " topHeightTex," << (float)(height / 1.5) << " height " << height << endl;
 	//Wall A
 	GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, topHeightTex, vertices);
 	if (doors[0] == true)
@@ -278,11 +369,6 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 		GenerateVert(x - (width / 2), y + (length / 4), height, (0.75 * lengthFinal), topHeightTex, vertices); // 5.2
 	}
 	GenerateVert(x - (width / 2), y + (length / 2), height, (int)(1 * length / 2), topHeightTex, vertices);
-}
-
-void BuildDoor()
-{
-
 }
 
 void AssignNewIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, int vertSize)
@@ -361,13 +447,16 @@ void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex>& v
 	vertices.push_back(vert);
 }
 
-void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices)
+void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices, bool flipNormal)
 {
 	for (int i = 0; i < indices.size(); i += 3)
 	{
+		int j = i + 1;
+		int k = i + 2;
+
 		Vertex vert1 = vertices[indices[i]];
-		Vertex vert2 = vertices[indices[i + 1]];
-		Vertex vert3 = vertices[indices[i + 2]];
+		Vertex vert2 = vertices[indices[j]];
+		Vertex vert3 = vertices[indices[k]];
 
 		//cout << vert1.Position.x << "," << vert2.Position.x << "," << vert3.Position.x << " X pos" << endl;
 
@@ -376,25 +465,39 @@ void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices)
 
 		glm::vec3 normal = CrossProduct(edgeA, edgeB);
 
-		vertices[indices[i]].Normal = normal;
-		vertices[indices[i + 1]].Normal = normal;
-		vertices[indices[i + 2]].Normal = normal;
 
-		//cout << edgeA.x << "," << edgeA.y << "," << edgeA.z << " - Edge A" << endl;
-		//cout << edgeB.x << "," << edgeB.y << "," << edgeB.z << " - Edge B" << endl;
+		if (flipNormal)
+		{
+			normal = -normal;
+		}
+
+		vertices[indices[i]].Normal = normal;
+		vertices[indices[j]].Normal = normal;
+		vertices[indices[k]].Normal = normal;
+
+		//cout << edgeA.x << "," << edgeA.y << "," << edgeA.z << " - Edge A " << i << endl;
+		//cout << edgeB.x << "," << edgeB.y << "," << edgeB.z << " - Edge B " << i << endl;
+
+		//cout << normal.x << ", " << normal.y << ", " << normal.z << " Normal " << i << endl;
 	}
 
 	for (int i = 0; i < vertices.size(); ++i)
 	{
+		//cout << vertices[i].Normal.x << ", " << vertices[i].Normal.y << ", " << vertices[i].Normal.z << " Normal " << i << endl;
+
 		vertices[i].Normal = glm::normalize(vertices[i].Normal);
+
+		cout << vertices[i].Normal.x << ", " << vertices[i].Normal.y << ", " << vertices[i].Normal.z << " Normal " << i << endl;
 	}
+
+	cout << "finished room normals" << endl;
 }
 
 glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
 {
-	int crossX = (a.y * b.z) - (a.z * b.y);
-	int crossY = (a.x * b.z) - (a.z * b.x);
-	int crossZ = (a.x * b.y) - (a.y * b.x);
+	float crossX = (a.y * b.z) - (a.z * b.y);
+	float crossY = (a.x * b.z) - (a.z * b.x);
+	float crossZ = (a.x * b.y) - (a.y * b.x);
 
 	//cout << crossX;
 	//cout << crossY;

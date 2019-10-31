@@ -3,20 +3,25 @@
 
 #include <mesh.h>
 #include <shader.h>
+#include <glm/glm.hpp>
 
 class Room
 {
 public:
 
 	vector<Mesh> meshes;
+	glm::vec3 position = {0,0,0};
 
 	Room()
 	{
 		meshes = {};
+		position = {0,0,0};
 	}
 
-	Room(Mesh floor, Mesh walls, Mesh ceiling)
+	Room(glm::vec3 pos, Mesh floor, Mesh walls, Mesh ceiling)
 	{
+		position = pos;
+
 		meshes.push_back(floor);
 		meshes.push_back(walls);
 		meshes.push_back(ceiling);

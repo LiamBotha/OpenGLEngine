@@ -50,6 +50,9 @@
     <ClInclude Include="levelGeneration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.fs">
@@ -58,10 +61,10 @@
     <None Include="shader.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="lightShader.vs">
+    <None Include="lightShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="lightShader.fs">
+    <None Include="lightShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
