@@ -17,8 +17,7 @@ void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum
 void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex>& vertices);
 
 void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices, bool flipNormal = false);
-glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b);
-
+vec3 CrossProduct(vec3 a, vec3 b);
 
 Mesh GenerateCube(float x, float y, float z)
 {
@@ -214,13 +213,19 @@ Room GenerateRoom(float x, float y, float length, float width, float height, boo
 	vector<Texture> ceilingTextures = {};
 
 	Texture floorTex = LoadTexture(floorPath.c_str(), "texture_diffuse");
+	Texture floorSpec = LoadTexture(floorPath.c_str(), "texture_Specular");
 	floorTextures.push_back(floorTex);
+	floorTextures.push_back(floorSpec);
 
 	Texture wallTex = LoadTexture(wallPath.c_str(), "texture_diffuse");
+	Texture wallSpec = LoadTexture(wallPath.c_str(), "texture_Specular");
 	wallTextures.push_back(wallTex);
+	wallTextures.push_back(wallSpec);
 
 	Texture ceilingTex = LoadTexture(ceilingPath.c_str(), "texture_diffuse");
+	Texture ceilingSpec = LoadTexture(ceilingPath.c_str(), "texture_Specular");
 	ceilingTextures.push_back(ceilingTex);
+	ceilingTextures.push_back(ceilingSpec);
 
 	int texCoordWidth = (1 * width / 2);
 	int texCoordLength = (1 * length / 2);
@@ -290,7 +295,7 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 		GenerateVert(x + (width / 2), y + (length / 4), 0, 0.25 * lengthFinal, 0.0, vertices); // 5.1
 		GenerateVert(x + (width / 2), y - (length / 4), 0, 0.75 * lengthFinal, 0.0, vertices); // 5.2
 	}
-	GenerateVert(x + (width / 2), y - (length / 2), 0, (int)(1 * length / 2), 0.0, vertices); cout << (int)(1 * length / 2) << " Max length" << endl;
+	GenerateVert(x + (width / 2), y - (length / 2), 0, (int)(1 * length / 2), 0.0, vertices);
 	 
 	//Wall C
 	GenerateVert(x + (width / 2), y - (length / 2), 0, 0.0, 0.0, vertices);
@@ -310,7 +315,6 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	}
 	GenerateVert(x - (width / 2), y + (length / 2), 0, (int)(1 * length / 2), 0.0, vertices);
 
-	cout << middleTexHeight << " middle height texture" << endl;
 	//Middle
 	if (doors[0] == true)
 	{
@@ -334,7 +338,6 @@ void BuildNormalWalls(float x, float y,float length, float width, float height, 
 	}
 
 	//Top
-	cout << topHeightTex << " topHeightTex," << (float)(height / 1.5) << " height " << height << endl;
 	//Wall A
 	GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, topHeightTex, vertices);
 	if (doors[0] == true)
@@ -418,12 +421,12 @@ void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum
 
 	++val;
 
-	int middleVal = val + xWidth - doorNum - (doorNum - 1); cout << middleVal << "," << middleVal + 1 << "," << val + xWidth + doorOffset - doorNum << "middle val index" << endl;
+	int middleVal = val + xWidth - doorNum - (doorNum - 1);
 	indices.push_back(middleVal);
 	indices.push_back(middleVal + 1);
 	indices.push_back(val + xWidth + doorOffset - 1);
 
-	indices.push_back(val + xWidth + doorOffset - 1); cout << val + xWidth + doorOffset - doorNum << "," << val + xWidth + doorOffset - (doorNum + 1) << "," << middleVal << "middle val index 2" << endl;
+	indices.push_back(val + xWidth + doorOffset - 1);
 	indices.push_back(val + xWidth + doorOffset - 2);
 	indices.push_back(middleVal);
 
@@ -481,7 +484,7 @@ void CalculateNormals(vector<unsigned int>& indices, vector<Vertex>& vertices, b
 	}
 }
 
-glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 b)
+vec3 CrossProduct(vec3 a, vec3 b)
 {
 	float crossX = (a.y * b.z) - (a.z * b.y);
 	float crossY = (a.x * b.z) - (a.z * b.x);

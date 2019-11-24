@@ -13,8 +13,9 @@ using json = nlohmann::json;
 #include <camera.h>
 #include <mesh.h>
 #include <room.h>
+#include <model.h>
 #include <levelGeneration.h>
-#include <pointLight.h>
+#include <light.h>
 
 #include <iostream>
 #include <vector>
@@ -28,18 +29,11 @@ void processInput(GLFWwindow* window);
 
 void LoadLevelFromFile(string levelPath);
 string SelectTexture(int texNumber);
-
-//Mesh GenerateMesh(float x, float y, float z, string texturePath);
-//Mesh GenerateRoomMesh(float x, float y, float length, float width, float height, bool doors[], string texturePath);
-//void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices);
-//void AssignIndices(bool doors[4], int doorCount, vector<unsigned int> &indices, int vertSize);
-//void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices);
-//void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices);
-//void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices);
+string SelectModel(int modelNumber);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_HEIGHT = 600; 
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.5f, 0.0f));
@@ -52,13 +46,13 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-//glm::vec3 lightPos(0.0f, 0.5f, 0.0f);
 Light directionalLight = Light({ 0,0,0 }, { 0.0f, -1.0f, 0.0f }, 2);
 
 vector<Room> rooms = {};
 vector<Light> pointLights = {};
 vector<Light> spotLights = {};
 vector<Mesh> pointMeshes = {};
+vector<Model> modelObjs = {};
 
 int main()
 {
@@ -101,20 +95,12 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader ourShader("shader.vs", "shader.fs");
-	Shader lightingShader("lightShader.vert", "lightShader.frag");
+	Shader lightingShader("normalShader.vert", "lightShader.frag");
 	Shader lightObjShader("light.vert", "light.frag");
 
 	// load models
 	// -----------
 	LoadLevelFromFile("level.json");
-
-	// positions of the point lights
-	glm::vec3 pointLightPositions[] = {
-		glm::vec3(0.0f,  1.0f,  2.0f),
-		glm::vec3(2.3f, -3.3f, -4.0f),
-		glm::vec3(0.0f,  1.0f, 0.0f),
-		glm::vec3(0.0f,  1.0f, -3.0f)
-	};
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -125,6 +111,8 @@ int main()
 	lightingShader.use();
 	lightingShader.setInt("material.diffuse", 0);
 	lightingShader.setInt("material.specular", 1);
+
+	cout << triCount << " - Triangles ";
 
 	// render loop
 	// -----------
@@ -146,16 +134,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// don't forget to enable shader before setting uniforms
-		//ourShader.use();
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", camera.Position);
 		lightingShader.setFloat("material.shininess", 15.0f);
-
-		// directional light
-		//lightingShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
-		//lightingShader.setVec3("dirLight.ambient", 0.08f, 0.08f, 0.08f);
-		//lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-		//lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
 		// view/projection tranansformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -169,10 +150,23 @@ int main()
 		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 		lightingShader.setMat4("model", model);
 
-		for (int i = 0; i < rooms.size(); ++i)
+		for (unsigned int i = 0; i < rooms.size(); ++i)
 		{			
 			rooms[i].Draw(lightingShader);
 		}
+
+		for (unsigned int i = 0; i < modelObjs.size(); ++i)
+		{
+			vec3 pos = modelObjs[i].position;
+
+			model = glm::translate(model, pos);
+			lightingShader.setMat4("model", model);
+
+			modelObjs[i].Draw(lightingShader);
+		}
+
+		model = glm::mat4(1.0f);
+		lightingShader.setMat4("model", model);
 
 		directionalLight.RenderLight(0, lightingShader);
 
@@ -187,7 +181,6 @@ int main()
 		lightObjShader.setMat4("projection", projection);
 		lightObjShader.setMat4("view", view);
 		lightObjShader.setMat4("model", model);
-		//lightMesh.Draw(ourShader);
 
 		for (int i = 0; i < pointMeshes.size(); i++)
 		{
@@ -279,12 +272,12 @@ void LoadLevelFromFile(string levelPath)
 
 	if (jsonFileString != "")
 	{
-		jsonObj = json::parse(jsonFileString);
+		jsonObj = json::parse(jsonFileString); // works its a visual studio bug
 	}
 
 	if (!jsonObj["Rooms"].is_null())
 	{
-		numRooms = jsonObj["Rooms"].size();
+		numRooms = jsonObj["Rooms"].size(); // works its a visual studio bug
 
 		cout << numRooms << " Number of Rooms" << endl;
 
@@ -343,21 +336,39 @@ void LoadLevelFromFile(string levelPath)
 			string wallPath = SelectTexture(wallTex);
 			string ceilingPath = SelectTexture(ceilingTex);
 
-			cout << roomX << ", " << roomY << ", " << roomZ << endl;
-
-			cout << height << " room height" << endl;
-
 			rooms.push_back(GenerateRoom(roomX, roomY, length, width, height, doors, floorPath, wallPath, ceilingPath));
 		}
 	}
 
 	if (!jsonObj["Models"].is_null())
 	{
-		numRooms = jsonObj["Models"].size();
+		numRooms = jsonObj["Models"].size(); // works its a visual studio bug
 
 		for (int i = 0; i < numRooms; ++i)
 		{
+			json model = jsonObj["Models"][i];
 
+			int modelID = 0;
+			int xPos = 0;
+			int yPos = 0;
+			int zPos = 0;
+
+			if (!model["ObjectID"].is_null())
+				modelID = model["ObjectID"];
+
+			if (!model["Position"][0].is_null())
+				xPos = model["Position"][0];
+			if (!model["Position"][1].is_null())
+				yPos = model["Position"][1];
+			if (!model["Position"][2].is_null())
+				zPos = model["Position"][2];
+
+
+			string modelPath = SelectModel(modelID);
+
+			cout << modelPath << " Path" << endl;
+
+			modelObjs.push_back(Model(modelPath.c_str(), glm::vec3(xPos,yPos,zPos)));
 		}
 	}
 
@@ -370,11 +381,9 @@ void LoadLevelFromFile(string levelPath)
 
 	if (!jsonObj["Lights"].is_null())
 	{
-		numRooms = jsonObj["Lights"].size();
+		numRooms = jsonObj["Lights"].size(); // works its a visual studio bug
 
 		numRooms = std::min(numRooms, 20);
-
-		cout << jsonObj["Lights"].size() << " Number of Lights";
 
 		for (int i = 0; i < numRooms; ++i)
 		{
@@ -413,6 +422,23 @@ void LoadLevelFromFile(string levelPath)
 			else
 			{
 
+				float dirX = 0;
+				float dirY = 0;
+				float dirZ = 0;
+
+				if (!light["Direction"][0].is_null())
+				{
+					dirX = light["Direction"][0];
+				}
+				if (!light["Direction"][1].is_null())
+				{
+					dirY = light["Direction"][1];
+				}
+				if (!light["Direction"][2].is_null())
+				{
+					dirZ = light["Direction"][2];
+				}
+
 				if (!light["Position"][0].is_null())
 					lightX = light["Position"][0];
 				if (!light["Position"][1].is_null())
@@ -423,9 +449,8 @@ void LoadLevelFromFile(string levelPath)
 				if (lightType == 0)
 					pointLights[i] = Light({ lightX,lightY,lightZ }, { 0,0,0 });
 				else if (lightType == 1)
-					spotLights[i] = Light({ lightX,lightY,lightZ }, { 0,0,0 }, 1);
-
-				cout << pointLights[i].position.x << "," << pointLights[i].position.y << "," << pointLights[i].position.z << endl;
+					spotLights[i] = Light({ lightX,lightY,lightZ }, { dirX,dirY,dirZ }, 1);
+				cout << lightType;
 
 				pointMeshes.push_back(GenerateCube(lightX, lightY, lightZ));
 			}
@@ -440,303 +465,9 @@ string SelectTexture(int texNumber)
 	return texturePath;
 }
 
-//Mesh GenerateMesh(float x, float y, float z, string texturePath)
-//{
-//	bool doors[4] = { false,false,false,false };
-//	vector<Vertex> vertices = {};
-//	vector<unsigned int> indices = {};
-//	vector<Texture> textures = {};
-//
-//	Vertex vertA = {};
-//	Vertex vertB = {};
-//	Vertex vertC = {};
-//	Vertex vertD = {};
-//
-//	vertA.Position = { x - 1.0, y - 1.0, z + 1.0 };
-//	vertB.Position = { x + 1.0, y - 1.0, z + 1.0 };
-//	vertC.Position = { x + 1.0, y + 1.0, z + 1.0 };
-//	vertD.Position = { x - 1.0, y + 1.0, z + 1.0 };
-//
-//	vertA.TexCoords = { 0.0f,0.0f };
-//	vertB.TexCoords = { 1.0f,0.0f };
-//	vertC.TexCoords = { 1.0f,1.0f };
-//	vertD.TexCoords = { 0.0f,1.0f };
-//
-//	vertices.push_back(vertA);
-//	vertices.push_back(vertB);
-//	vertices.push_back(vertC);
-//	vertices.push_back(vertD);
-//
-//	indices.push_back(0);
-//	indices.push_back(1);
-//	indices.push_back(2);
-//	indices.push_back(2);
-//	indices.push_back(3);
-//	indices.push_back(0);
-//
-//	//AssignIndices(doors, 0, indices, vertices.size());
-//
-//	Texture tex = LoadTexture(texturePath.c_str(), "texture_diffuse");
-//
-//	textures.push_back(tex);
-//
-//	return Mesh(vertices, indices, textures);
-//}
-//
-//Mesh GenerateRoomMesh(float x, float y, float length, float width, float height,bool doors[], string texturePath)
-//{
-//	int doorCount = 0;
-//	for (int i = 0; i < 4; ++i)
-//	{
-//		if (doors[i] == true)
-//		{
-//			++doorCount;
-//		}
-//	}
-//
-//	vector<Vertex> vertices = {};
-//	vector<unsigned int> indices = {};
-//	vector<Texture> textures = {};
-//
-//	Texture tex = LoadTexture(texturePath.c_str(), "texture_diffuse");
-//	Texture tex2 = LoadTexture("Textures/awesomeface.png", "texture_diffuse");
-//
-//	textures.push_back(tex);
-//	textures.push_back(tex2);
-//
-//	BuildWalls(x, y, length, width, height, doors, doorCount, vertices); // minus 0.001f
-//
-//	AssignIndices(doors, doorCount, indices, vertices.size() - 4);
-//
-//	return Mesh(vertices, indices, textures);
-//}
+string SelectModel(int modelNumber)
+{
+	string modelPath = std::string("Models/") + std::to_string(modelNumber) + "/model_" + std::to_string(modelNumber) + std::string(".obj");
 
-////void BuildWalls(float x, float y, float length, float width, float height, bool doors[4], int doorCount, vector<Vertex> &vertices)
-////{
-////	int downTex = 0;
-////
-////	//Bottom Wall Verts
-////	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); // 4
-////	downTex += 1.0 * width / 2;
-////
-////	if (doors[0] == true)
-////	{
-////		cout << "door 0" << endl;
-////		GenerateVert(x - (width / 4), y + (length / 2), 0, downTex, 1.0, vertices); // 5.1
-////		GenerateVert(x + (width / 4), y + (length / 2), 0, downTex + 1, 1.0, vertices); // 5.2
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x + (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
-////	downTex += 1.0 * length / 2;
-////
-////	if (doors[1] == true)
-////	{
-////		cout << "door 1" << endl;
-////		GenerateVert(x + (width / 2), y + (length / 4), 0, downTex, 1.0, vertices); // 6.1
-////		GenerateVert(x + (width / 2), y - (length / 4), 0, downTex + 1, 1.0, vertices); // 6.1
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x + (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); //
-////	downTex += 1.0 * width / 2;
-////
-////	if (doors[2] == true)
-////	{
-////		cout << "door 2" << endl;
-////		GenerateVert(x + (width / 4), y - (length / 2), 0, downTex, 1.0, vertices); // 7.1
-////		GenerateVert(x - (width / 4), y - (length / 2), 0, downTex + 1, 1.0, vertices); // 7.2
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x - (width / 2), y - (length / 2), 0, downTex, 1.0, vertices); // 7
-////	downTex += 1.0 * length / 2;
-////
-////	if (doors[3] == true)
-////	{
-////		cout << "door 3" << endl;
-////		GenerateVert(x - (width / 2), y - (length / 4), 0, downTex, 1.0, vertices); // 8.1
-////		GenerateVert(x - (width / 2), y + (length / 4), 0, downTex + 1, 1.0, vertices); // 8.2
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x - (width / 2), y + (length / 2), 0, downTex, 1.0, vertices); cout << downTex * width << " - down tex, " << width << endl;
-////
-////	downTex = 1.0;
-////	//Middle Verts
-////	if (doors[0] == true)
-////	{
-////		GenerateVert(x - (width / 4), y + (length / 2), (height / 1.5), downTex, 1.0, vertices); // 5.1
-////		GenerateVert(x + (width / 4), y + (length / 2), (height / 1.5), downTex + 1, 1.0, vertices); // 5.2
-////		downTex += 3;
-////	}
-////	else downTex++;
-////	if (doors[1] == true)
-////	{
-////		GenerateVert(x + (width / 2), y + (length / 4), (height / 1.5), downTex, 1.0, vertices); // 6.1
-////		GenerateVert(x + (width / 2), y - (length / 4), (height / 1.5), downTex + 1, 1.0, vertices); // 6.1
-////		downTex += 3;
-////	}
-////	else downTex++;
-////	if (doors[2] == true)
-////	{
-////		GenerateVert(x + (width / 4), y - (length / 2), (height / 1.5), downTex, 1.0, vertices); // 7.1
-////		GenerateVert(x - (width / 4), y - (length / 2), (height / 1.5), downTex + 1, 1.0, vertices); // 7.2
-////		downTex += 3;
-////	}
-////	else downTex++;
-////	if (doors[3] == true)
-////	{
-////		GenerateVert(x - (width / 2), y - (length / 4), (height / 1.5), downTex, 1.0, vertices); // 8.1
-////		GenerateVert(x - (width / 2), y + (length / 4), (height / 1.5), downTex + 1, 1.0, vertices); // 8.2
-////		downTex += 3;
-////	}
-////
-////	downTex = 0.0;
-////	//nextTex = 0.0;
-////
-////	// Top Wall Verts
-////	GenerateVert(x - (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 9
-////	downTex += 1.0 * width / 2;
-////
-////	if (doors[0] == true)
-////	{
-////
-////		GenerateVert(x - (width / 4), y + (length / 2), height, downTex, 0.0, vertices); // 8.1
-////		GenerateVert(x + (width / 4), y + (length / 2), height, downTex + 1, 0.0, vertices); // 8.2
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x + (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 10
-////	downTex += 1.0 * length /2 ;
-////
-////	if (doors[1] == true)
-////	{
-////		GenerateVert(x + (width / 2), y + (length / 4), height, downTex, 0.0, vertices); // 8.1
-////		GenerateVert(x + (width / 2), y - (length / 4), height, downTex + 1, 0.0, vertices); // 8.2
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x + (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 11
-////	downTex += 1.0 * width / 2;
-////
-////	if (doors[2] == true)
-////	{
-////		GenerateVert(x + (width / 4), y - (length / 2), height, downTex, 0.0, vertices); // 8.1
-////		GenerateVert(x - (width / 4), y - (length / 2), height, downTex + 1, 0.0, vertices); // 8.2
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x - (width / 2), y - (length / 2), height, downTex, 0.0, vertices); // 12
-////	downTex += 1.0 * length / 2;
-////
-////	if (doors[3] == true)
-////	{
-////		GenerateVert(x - (width / 2), y - (length / 4), height, downTex, 0.0, vertices); // 8.1
-////		GenerateVert(x - (width / 2), y + (length / 4), height, downTex + 1, 0.0, vertices); // 8.2
-////		downTex += 2.0;
-////	}
-////
-////	GenerateVert(x - (width / 2), y + (length / 2), height, downTex, 0.0, vertices); // 13
-////}
-//
-//void AssignIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, int vertSize)
-//{
-//	//std::cout << vertSize << " - verts" << std::endl;
-//
-//	//indices.push_back(vertSize - 11 - (doorCount * 6));
-//	//indices.push_back(vertSize - 12 - (doorCount * 6));
-//	//indices.push_back(vertSize - 13 - (doorCount * 6));
-//	//indices.push_back(vertSize - 13 - (doorCount * 6));
-//	//indices.push_back(vertSize - 14 - (doorCount * 6));
-//	//indices.push_back(vertSize - 11 - (doorCount * 6));
-//
-//	int yWidth = 5 + (4 * doorCount);
-//	int xWidth = (5 + (2 * doorCount));
-//
-//	int val2 = (vertSize - (xWidth * 2 + (doorCount * 2)));
-//
-//	for (int i = 0, j = 0; j < 4; ++i, ++j) // increment j in code
-//	{
-//
-//		if (doors != nullptr && doors[j] == true)
-//		{
-//			DrawDoorIndices(i, yWidth, xWidth, doorCount, j + 1, indices);
-//			i += 2;
-//		}
-//		else
-//		{
-//			DrawQuadIndices(i, yWidth, indices); 
-//		}
-//	}
-//
-//	//indices.push_back(vertSize + 0);
-//	//indices.push_back(vertSize + 1);
-//	//indices.push_back(vertSize + 2);
-//	//indices.push_back(vertSize + 2);
-//	//indices.push_back(vertSize + 3);
-//	//indices.push_back(vertSize + 0);
-//}
-
-//void DrawQuadIndices(int val, int xWidth, vector<unsigned int> &indices)
-//{
-//	indices.push_back(val);
-//	indices.push_back(val + 1);
-//	indices.push_back(val + xWidth + 1);
-//
-//	indices.push_back(val + xWidth + 1);
-//	indices.push_back(val + xWidth);
-//	indices.push_back(val);
-//}
-//
-//void DrawDoorIndices(int val, int yWidth, int xWidth, int doorCount, int doorNum, vector<unsigned int> &indices)
-//{
-//	int doorOffset = (2 + (2 * doorCount));
-//
-//	indices.push_back(val);
-//	indices.push_back(val + 1);
-//	indices.push_back(val + yWidth + 1);
-//
-//	indices.push_back(val + yWidth + 1);
-//	indices.push_back(val + yWidth);
-//	indices.push_back(val);
-//
-//	++val;
-//
-//	//Door
-//	//indices.push_back(val);
-//	//indices.push_back(val + 1);
-//	//indices.push_back(val + xWidth - (doorNum - 1));
-//
-//	//indices.push_back(val + xWidth - (doorNum - 1));
-//	//indices.push_back(val + xWidth - doorNum);
-//	//indices.push_back(val);
-//
-//	indices.push_back(val + xWidth - doorNum);
-//	indices.push_back(val + xWidth - (doorNum - 1));
-//	indices.push_back(val + xWidth + doorOffset - 1);
-//
-//	indices.push_back(val + xWidth + doorOffset - 1);
-//	indices.push_back(val + xWidth + doorOffset - 2);
-//	indices.push_back(val + xWidth - doorNum);
-//
-//	++val;
-//
-//	indices.push_back(val);
-//	indices.push_back(val + 1);
-//	indices.push_back(val + yWidth + 1);
-//
-//	indices.push_back(val + yWidth + 1);
-//	indices.push_back(val + yWidth);
-//	indices.push_back(val);
-//}
-
-//void GenerateVert(float x, float y, float z, float u, float v, vector<Vertex> &vertices)
-//{
-//	Vertex vert = {};
-//
-//	vert.Position = { x,z,y };
-//	vert.TexCoords = { u,v };
-//
-//	vertices.push_back(vert);
-//}
+	return modelPath;
+}

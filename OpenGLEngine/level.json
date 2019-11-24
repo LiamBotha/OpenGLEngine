@@ -6,7 +6,7 @@
       "Width": 5,
       "Height": 4,
       "FloorTexture": 8,
-      "WallTexture": 12,
+      "WallTexture": 10,
       "CeilingTexture": 1,
       "Doors": [ true, false, false, false ]
     },
@@ -16,30 +16,37 @@
       "Width": 3,
       "Height": 3,
       "FloorTexture": 1,
-      "WallTexture": 0,
+      "WallTexture": 2,
       "CeilingTexture": 1,
+      "Doors": [ true, false, true, false ]
+    },
+    {
+      "Position": [ 0, 11, 0 ],
+      "Length": 5,
+      "Width": 3,
+      "Height": 3,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
       "Doors": [ true, false, true, false ]
     }
   ],
   "Models" :[
     {
       "ObjectID": 1,
-      "Position": [ 0, 0, 0 ],
+      "Position": [ 10, 0, 10 ],
       "Rotation": [ 0, 0, 0 ]
     }
   ],
   "Lights": [
     {
       "Type": 1,
-      "Position": [ 0, 4, 0 ]
-    },
-    {
-      "Type": 0,
-      "Position": [ 0, 2, 7 ]
+      "Position": [ 0, 3, 0 ],
+      "Direction": [ 0, -1, 0 ]
     },
     {
       "Type": 2,
-      "Direction": [ 0, -2, 0 ]
+      "Direction": [ 0, -1, 0.5 ]
     }
   ] 
 }

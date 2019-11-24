@@ -34,6 +34,8 @@ struct Texture {
 	string path;
 };
 
+int triCount = 0;
+
 unsigned int TextureFromFile(const char* path);
 
 Texture LoadTexture(const char* path, string typeName);
@@ -60,6 +62,8 @@ public:
 		this->vertices = vertices;
 		this->indices = indices;
 		this->textures = textures;
+
+		triCount += (indices.size() / 3);
 
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();

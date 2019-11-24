@@ -97,12 +97,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\json-develop\single_include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glm;C:\Users\User\Documents\Visual Studio 2019\Libraries\glad\include;C:\Users\User\source\repos\OpenGLEngine\OpenGLEngine;C:\Users\User\source\repos\OpenGLEngine\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN32\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include\json-develop\single_include;$(SolutionDir)\include\glm;$(SolutionDir)\include\glad\include;$(SolutionDir)\OpenGLEngine;$(SolutionDir)\include\tinyobjloader;$(SolutionDir)\include\include;$(SolutionDir)\include\glfw-3.3.bin.WIN32\include;$(SolutionDir)\include\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\User\source\repos\OpenGLEngine\include\tinyobjloader;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,14 +131,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\json-develop\single_include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glm;C:\Users\User\Documents\Visual Studio 2019\Libraries\glad\include;C:\Users\User\source\repos\OpenGLEngine\OpenGLEngine;C:\Users\User\source\repos\OpenGLEngine\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN32\include;C:\Users\User\Documents\Visual Studio 2019\Libraries\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include\json-develop\single_include;$(SolutionDir)\include\glm;$(SolutionDir)\include\glad\include;$(SolutionDir)\OpenGLEngine;$(SolutionDir)\include\tinyobjloader;$(SolutionDir)\include\include;$(SolutionDir)\include\glfw-3.3.bin.WIN32\include;$(SolutionDir)\include\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\User\source\repos\OpenGLEngine\include\tinyobjloader;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -149,7 +149,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="levelGeneration.h" />
-    <ClInclude Include="pointLight.h" />
+    <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="room.h" />
@@ -160,15 +160,22 @@
     <None Include="light.vert" />
     <None Include="lightShader.frag" />
     <None Include="lightShader.vert" />
+    <None Include="normalShader.frag" />
+    <None Include="normalShader.vert" />
     <None Include="shader.fs" />
     <None Include="shader.vs" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Textures\img_0.jpg" />
     <Image Include="Textures\img_1.jpg" />
+    <Image Include="Textures\img_10.jpg" />
     <Image Include="Textures\img_2.jpg" />
     <Image Include="Textures\img_3.jpg" />
     <Image Include="Textures\img_4.jpg" />
+    <Image Include="Textures\img_5.jpg" />
+    <Image Include="Textures\img_6.jpg" />
+    <Image Include="Textures\img_7.jpg" />
+    <Image Include="Textures\img_8.jpg" />
+    <Image Include="Textures\img_9.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

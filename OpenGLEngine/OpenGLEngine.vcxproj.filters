@@ -41,16 +41,16 @@
     <ClInclude Include="mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="room.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="levelGeneration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pointLight.h">
+    <ClInclude Include="light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -73,6 +73,12 @@
     <None Include="light.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="normalShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="normalShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\img_1.jpg">
@@ -81,13 +87,28 @@
     <Image Include="Textures\img_2.jpg">
       <Filter>Textures</Filter>
     </Image>
-    <Image Include="Textures\img_0.jpg">
-      <Filter>Textures</Filter>
-    </Image>
     <Image Include="Textures\img_3.jpg">
       <Filter>Textures</Filter>
     </Image>
     <Image Include="Textures\img_4.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_5.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_6.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_7.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_8.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_9.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Textures\img_10.jpg">
       <Filter>Textures</Filter>
     </Image>
   </ItemGroup>
