@@ -1,40 +1,260 @@
 {
   "Rooms": [
     {
-      "Position": [ 0, 0, 0 ],
-      "Length": 7,
-      "Width": 5,
+      "Position": [ 0, 2, 0 ],
+      "Length": 15,
+      "Width": 15,
       "Height": 4,
       "FloorTexture": 8,
       "WallTexture": 10,
       "CeilingTexture": 1,
-      "Doors": [ true, false, false, false ]
+      "Doors": [ 2, 1, 1, 1, 1 ]
     },
     {
-      "Position": [ 0, 6, 0 ],
-      "Length": 5,
-      "Width": 3,
-      "Height": 3,
+      "Position": [ 0, 17, 0 ],
+      "Length": 15,
+      "Width": 7,
+      "Height": 4,
       "FloorTexture": 1,
       "WallTexture": 2,
       "CeilingTexture": 1,
-      "Doors": [ true, false, true, false ]
+      "Doors": [ 2, 1, 2, 1, 0 ]
     },
     {
-      "Position": [ 0, 11, 0 ],
-      "Length": 5,
-      "Width": 3,
-      "Height": 3,
+      "Position": [ 0, 29, 0 ],
+      "Length": 9,
+      "Width": 15,
+      "Height": 4,
       "FloorTexture": 7,
       "WallTexture": 5,
       "CeilingTexture": 6,
-      "Doors": [ true, false, true, false ]
+      "Doors": [ 2, 1, 2, 2, 1 ]
+    },
+    {
+      "Position": [ 0, 40, 0 ],
+      "Length": 13,
+      "Width": 7,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 1, 2, 1, 1 ]
+    },
+    {
+      "Position": [ -27, 29, 0 ],
+      "Length": 15,
+      "Width": 15,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 2, 1, 1, 1 ]
+    },
+    {
+      "Position": [ -13.5, 29, 0 ],
+      "Length": 9,
+      "Width": 12,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 2, 2, 2, 1 ]
+    },
+    {
+      "Position": [ -13.5, 22, 0 ],
+      "Length": 5,
+      "Width": 7,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 1, 0, 1, 1 ]
+    },
+    {
+      "Position": [ -13.5, 16, 0 ],
+      "Length": 7,
+      "Width": 7,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 0, 1, 1, 2, 1 ]
+    },
+    {
+      "Position": [ -24, 16, 0 ],
+      "Length": 7,
+      "Width": 14,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 2, 1, 1, 1 ]
+    },
+    {
+      "Position": [ 0, 53, 0 ],
+      "Length": 13,
+      "Width": 15,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 2, 2, 2, 1 ]
+    },
+    {
+      "Position": [ 12.5, 53, 0 ],
+      "Length": 5,
+      "Width": 10,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 2, 1, 2, 1 ]
+    },
+    {
+      "Position": [ 20, 53, 0 ],
+      "Length": 5,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 1, 0, 2, 1 ]
+    },
+    {
+      "Position": [ 20, 49, 0 ],
+      "Length": 3,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 1, 2, 1, 1 ]
+    },
+    {
+      "Position": [ 20, 45, 0 ],
+      "Length": 5,
+      "Width": 9,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 2, 1, 1, 1 ]
+    },
+    {
+      "Position": [ 31, 45, 0 ],
+      "Length": 10,
+      "Width": 13,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 1, 2, 2, 1 ]
+    },
+    {
+      "Position": [ 31, 35, 0 ],
+      "Length": 10,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 1, 2, 1, 1 ]
+    },
+    {
+      "Position": [ 31, 25, 0 ],
+      "Length": 10,
+      "Width": 11,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 1, 2, 1, 1 ]
+    },
+    {
+      "Position": [ 31, 14, 0 ],
+      "Length": 13,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 1, 2, 1, 1 ]
+    },
+    {
+      "Position": [ 31, 5.5, 0 ],
+      "Length": 5,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 0, 0, 1, 0, 1 ]
+    },
+    {
+      "Position": [ 38, 5.5, 0 ],
+      "Length": 5,
+      "Width": 9,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 0, 1, 0, 1 ]
+    },
+    {
+      "Position": [ 45, 5.5, 0 ],
+      "Length": 5,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 0, 1, 1, 0, 1 ]
+    },
+    {
+      "Position": [ 45, 20, 0 ],
+      "Length": 24,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 0, 1, 0, 1, 1 ]
+    },
+    {
+      "Position": [ 45, 34.5, 0 ],
+      "Length": 5,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 2, 1, 0, 2, 1 ]
+    },
+    {
+      "Position": [ 40, 34.5, 0 ],
+      "Length": 5,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 1,
+      "WallTexture": 1,
+      "CeilingTexture": 1,
+      "Doors": [ 1, 2, 1, 1, 1 ]
+    },
+    {
+      "Position": [ 24, 5.5, 0 ],
+      "Length": 5,
+      "Width": 9,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 0, 1, 2, 1 ]
     }
   ],
-  "Models" :[
+  "Models": [
     {
-      "ObjectID": 1,
-      "Position": [ 10, 0, 10 ],
+      "ObjectID": 2,
+      "Position": [ -1, 0, -10 ],
       "Rotation": [ 0, 0, 0 ]
     }
   ],
@@ -47,6 +267,11 @@
     {
       "Type": 2,
       "Direction": [ 0, -1, 0.5 ]
+    },
+    {
+      "Type": 0,
+      "Position": [ -1, 10, -1 ],
+      "Direction": [ 0, -1, 0.5 ]
     }
-  ] 
+  ]
 }

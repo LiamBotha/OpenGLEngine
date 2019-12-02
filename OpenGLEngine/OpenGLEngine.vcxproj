@@ -102,7 +102,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\User\source\repos\OpenGLEngine\include\tinyobjloader;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\User\Documents\Assimp\assimp-master\Build\code\Debug;C:\Users\User\source\repos\OpenGLEngine\include\tinyobjloader;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,7 +138,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\User\source\repos\OpenGLEngine\include\tinyobjloader;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\User\Documents\Assimp\assimp-master\Build\code\Debug;C:\Users\User\source\repos\OpenGLEngine\include\tinyobjloader;C:\Users\User\Documents\Visual Studio 2019\Libraries\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -154,6 +154,7 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="skybox.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="light.frag" />
@@ -164,6 +165,8 @@
     <None Include="normalShader.vert" />
     <None Include="shader.fs" />
     <None Include="shader.vs" />
+    <None Include="skyboxShader.frag" />
+    <None Include="skyboxShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\img_1.jpg" />

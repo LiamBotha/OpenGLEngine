@@ -16,20 +16,29 @@ using json = nlohmann::json;
 #include <model.h>
 #include <levelGeneration.h>
 #include <light.h>
+#include <skybox.h>
+
+#include <time.h>
 
 #include <iostream>
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <thread>
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-void LoadLevelFromFile(string levelPath);
+void LoadLevelFromFile();
 string SelectTexture(int texNumber);
 string SelectModel(int modelNumber);
+
+void GetFPS();
+void GetUserCommands();
+void DepthMapFBO();
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -44,6 +53,10 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+int initial_time = time(NULL), final_time, frame_count = 0;
+
+bool showFPS = false;
 
 // lighting
 Light directionalLight = Light({ 0,0,0 }, { 0.0f, -1.0f, 0.0f }, 2);
@@ -92,15 +105,71 @@ int main()
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 
+	///DepthMapFBO();
+
 	// build and compile shaders
 	// -------------------------
 	Shader ourShader("shader.vs", "shader.fs");
-	Shader lightingShader("normalShader.vert", "lightShader.frag");
 	Shader lightObjShader("light.vert", "light.frag");
+	Shader normalMapShader("normalShader.vert", "normalShader.frag");
+	Shader skyboxShader("skyboxShader.vert", "skyboxShader.frag");
+
+	Skybox skybox = Skybox("craterlake");
 
 	// load models
 	// -----------
-	LoadLevelFromFile("level.json");
+	LoadLevelFromFile();
+
+	string playerText = "";
+
+	while (!playerText._Equal("Start"))
+	{
+		std::cout << "Enter Commands" << endl;
+		cin >> playerText;
+
+		if (playerText._Equal("LoadModel"))
+		{
+			int x, y, z;
+			string modelPath = "";
+
+			cout << "Input Name: ";
+			cin >> modelPath;
+
+			cout << "Input Position: " << endl;
+			cout << "X Position: ";
+			cin >> x;
+			cout << "Y Position: ";
+			cin >> y;
+			cout << "Z Position: ";
+			cin >> z;
+
+			cout << "Loading..." << endl;
+
+			string fullPath = ("Models/" + modelPath + "/");
+
+			modelObjs.push_back(Model(fullPath.c_str(),modelPath, glm::vec3(x, y, z)));
+		}
+		else if (playerText._Equal("FPS"))
+		{
+			showFPS = !showFPS;
+
+			cout << "Show FPS - " << showFPS << endl;
+		}
+		else if (playerText._Equal("NumTris"))
+		{
+			cout << triCount << " - Triangles " << endl;
+		}
+		else if (playerText._Equal("Help"))
+		{
+			cout << "Commands Are: Start, LoadModel, FPS, NumTris" << endl;
+		}
+		else if (playerText._Equal("Start"))
+		{
+			cout << "Starting Level..." << endl;
+		}
+		else
+			cout << "Invalid Command: " << playerText << endl;
+	}
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -108,11 +177,17 @@ int main()
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_FRONT);
 
-	lightingShader.use();
-	lightingShader.setInt("material.diffuse", 0);
-	lightingShader.setInt("material.specular", 1);
+	//lightingShader.use();
+	//lightingShader.setInt("material.diffuse", 0);
+	//lightingShader.setInt("material.specular", 1);
 
-	cout << triCount << " - Triangles ";
+	normalMapShader.use();
+	normalMapShader.setInt("material.diffuse", 0);
+	normalMapShader.setInt("material.specular", 1);
+	normalMapShader.setInt("material.normal", 2);
+
+	skyboxShader.use();
+	skyboxShader.setInt("skybox", 0);
 
 	// render loop
 	// -----------
@@ -134,25 +209,32 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// don't forget to enable shader before setting uniforms
-		lightingShader.use();
-		lightingShader.setVec3("viewPos", camera.Position);
-		lightingShader.setFloat("material.shininess", 15.0f);
+		//lightingShader.use();
+		//lightingShader.setVec3("viewPos", camera.Position);
+		//lightingShader.setFloat("material.shininess", 15.0f);
+		normalMapShader.use();
+		normalMapShader.setVec3("viewPos", camera.Position);
+		normalMapShader.setFloat("material.shininess", 15.0f);
 
 		// view/projection tranansformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
-		lightingShader.setMat4("projection", projection);
-		lightingShader.setMat4("view", view);
+		//lightingShader.setMat4("projection", projection);
+		//lightingShader.setMat4("view", view);
+
+		normalMapShader.setMat4("projection", projection);
+		normalMapShader.setMat4("view", view);
 
 		// render the loaded model
 		glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
 		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-		lightingShader.setMat4("model", model);
+		//lightingShader.setMat4("model", model);
+		normalMapShader.setMat4("model", model);
 
 		for (unsigned int i = 0; i < rooms.size(); ++i)
 		{			
-			rooms[i].Draw(lightingShader);
+			rooms[i].Draw(normalMapShader);
 		}
 
 		for (unsigned int i = 0; i < modelObjs.size(); ++i)
@@ -160,21 +242,21 @@ int main()
 			vec3 pos = modelObjs[i].position;
 
 			model = glm::translate(model, pos);
-			lightingShader.setMat4("model", model);
+			normalMapShader.setMat4("model", model);
 
-			modelObjs[i].Draw(lightingShader);
+			modelObjs[i].Draw(normalMapShader);
+
+			model = glm::mat4(1.0f);
 		}
+		normalMapShader.setMat4("model", model);
 
-		model = glm::mat4(1.0f);
-		lightingShader.setMat4("model", model);
-
-		directionalLight.RenderLight(0, lightingShader);
+		directionalLight.RenderLight(0, normalMapShader);
 
 		for (int i = 0; i < pointLights.size(); i++)
 		{
-			pointLights[i].RenderLight(i , lightingShader);
+			pointLights[i].RenderLight(i , normalMapShader);
 
-			spotLights[i].RenderLight(i , lightingShader);
+			spotLights[i].RenderLight(i , normalMapShader);
 		}
 
 		lightObjShader.use();
@@ -187,10 +269,23 @@ int main()
 			pointMeshes[i].Draw(lightObjShader);
 		}
 
+		model = glm::mat4(1.0f);
+		view = camera.GetViewMatrix();
+		projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+		// draw skybox as last
+		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+		skyboxShader.use();
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+		skyboxShader.setMat4("view", view);
+		skyboxShader.setMat4("projection", projection);
+		skybox.drawSkybox(skyboxShader);
+
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		GetFPS();
 	}
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
@@ -252,27 +347,40 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	camera.ProcessMouseScroll(yoffset);
 }
 
-void LoadLevelFromFile(string levelPath)
+void LoadLevelFromFile()
 {
+	bool validLevel = false;
+	string levelName = "";
 	int numRooms = 0;
 	string jsonFileString = "";
 	string line = "";
 	json jsonObj;
 
-	ifstream jsonFile(levelPath);
-
-	while (jsonFile.is_open())
+	while (!validLevel)
 	{
-		while (getline(jsonFile, line))
+		std::cout << "Enter Level Name" << endl;
+		cin >> levelName;
+
+		ifstream jsonFile(levelName + ".json");
+
+		while (jsonFile.is_open())
 		{
-			jsonFileString += line;
+			while (getline(jsonFile, line))
+			{
+				jsonFileString += line;
+			}
+			jsonFile.close();
 		}
-		jsonFile.close();
-	}
 
-	if (jsonFileString != "")
-	{
-		jsonObj = json::parse(jsonFileString); // works its a visual studio bug
+		if (jsonFileString != "")
+		{
+			validLevel = true;
+			jsonObj = json::parse(jsonFileString); // works its a visual studio bug
+		}
+		else
+		{
+			cout << "Invalid File - " << levelName << endl;
+		}
 	}
 
 	if (!jsonObj["Rooms"].is_null())
@@ -318,7 +426,7 @@ void LoadLevelFromFile(string levelPath)
 			if (!room["CeilingTexture"].is_null())
 				ceilingTex = room["CeilingTexture"];
 
-			bool doors[4] = { false, false, false, false };
+			int doors[5] = { 1,1,1,1,1 };
 
 			if (!room["Doors"][0].is_null())
 				doors[0] = room["Doors"][0];
@@ -331,6 +439,9 @@ void LoadLevelFromFile(string levelPath)
 
 			if (!room["Doors"][3].is_null())
 				doors[3] = room["Doors"][3];
+
+			if (!room["Doors"][4].is_null())
+				doors[4] = room["Doors"][4];
 
 			string floorPath = SelectTexture(floorTex);
 			string wallPath = SelectTexture(wallTex);
@@ -368,7 +479,7 @@ void LoadLevelFromFile(string levelPath)
 
 			cout << modelPath << " Path" << endl;
 
-			modelObjs.push_back(Model(modelPath.c_str(), glm::vec3(xPos,yPos,zPos)));
+			modelObjs.push_back(Model(modelPath.c_str(),"model_" + std::to_string(modelID), glm::vec3(xPos,yPos,zPos)));
 		}
 	}
 
@@ -450,11 +561,17 @@ void LoadLevelFromFile(string levelPath)
 					pointLights[i] = Light({ lightX,lightY,lightZ }, { 0,0,0 });
 				else if (lightType == 1)
 					spotLights[i] = Light({ lightX,lightY,lightZ }, { dirX,dirY,dirZ }, 1);
-				cout << lightType;
 
 				pointMeshes.push_back(GenerateCube(lightX, lightY, lightZ));
 			}
 		}
+	}
+
+	if (!jsonObj["Skybox"].is_null())
+	{
+		string skyboxName = jsonObj["Skybox"]["Name"];
+
+		//skybox = Skybox(skyboxName);
 	}
 }
 
@@ -467,7 +584,51 @@ string SelectTexture(int texNumber)
 
 string SelectModel(int modelNumber)
 {
-	string modelPath = std::string("Models/") + std::to_string(modelNumber) + "/model_" + std::to_string(modelNumber) + std::string(".obj");
+	string modelPath = std::string("Models/") + std::string("model_") + std::to_string(modelNumber) + "/";
 
 	return modelPath;
+}
+
+void GetFPS()
+{
+	frame_count++;
+	final_time = time(NULL);
+
+	if (final_time - initial_time > 0)
+	{
+		if (showFPS)
+			cout << "FPS: " << (frame_count / (final_time - initial_time)) << endl;
+		frame_count = 0;
+		initial_time = final_time;
+	}
+}
+
+void GetUserCommands()
+{
+	string text;
+	cin >> text;
+}
+
+void DepthMapFBO()
+{
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

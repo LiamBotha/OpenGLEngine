@@ -11,14 +11,13 @@
 #include <tiny_obj_loader.h>
 
 #include <mesh.h>
+#include <levelGeneration.h>
 #include <shader.h>
 
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
-#include <map>
-#include <vector>
+
 using namespace std;
 
 class Model
@@ -32,11 +31,11 @@ public:
 
 	}
 
-	Model(string const &path, glm::vec3 newPos = { 0,0,0 })
+	Model(string const &path, string fileName, glm::vec3 newPos = { 0,0,0 })
 	{
 		position = newPos;
 
-		LoadModel(path);
+		LoadModel(path, fileName);
 	}
 
 	void Draw(Shader shader)
@@ -49,7 +48,7 @@ public:
 
 private:
 
-	void LoadModel(string const& path)
+	void LoadModel(string const& path, string fileName)
 	{
 		tinyobj::attrib_t attrib;
 		vector<tinyobj::shape_t> shapes;
@@ -57,8 +56,20 @@ private:
 		vector<vector<Texture>> textures;
 		string warn, err;
 
-		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path.c_str(), "Models/Materials/")) {
-			throw std::runtime_error(warn + err);
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,(path + fileName + ".obj").c_str(), path.c_str())) {
+			
+			cout << "ERROR - " << err;
+			//throw std::runtime_error(warn + err);
+		}
+
+		if (!warn.empty())
+		{
+			cerr << warn << endl;
+		}
+
+		if (!err.empty())
+		{
+			cerr << err << endl;
 		}
 
 		for (int k = 0; k < materials.size(); ++k)
@@ -74,28 +85,84 @@ private:
 				int comp;
 
 				std::string texture_filename = mp->diffuse_texname;
+
+				if (!texture_filename._Equal(""))
+				{
+					texture_filename = path + texture_filename;
+					std::cout << texture_filename << " - Texture" << endl;
+					Texture tex = LoadTexture(texture_filename.c_str(), "texture_diffuse");
+					meshTextures.push_back(tex);
+				}
+				else
+				{
+					Texture tex = {};
+					tex.id = 0;
+					tex.type = "texture_diffuse";
+					meshTextures.push_back(tex);
+				}
+			}
+
+			if (mp->specular_texname.length() > 0)
+			{
 				std::string specular_filename = mp->specular_texname;
+
+				if (!specular_filename._Equal(""))
+				{
+					specular_filename = path + specular_filename;
+					std::cout << specular_filename << " - Specular" << endl;
+					Texture spec = LoadTexture(specular_filename.c_str(), "texture_specular");
+					meshTextures.push_back(spec);
+				}
+				else
+				{
+					Texture spec = {};
+					spec.id = 0;
+					spec.type = "texture_specular";
+					meshTextures.push_back(spec);
+				}
+			}
+
+			if (mp->normal_texname.length() > 0)
+			{
 				std::string normal_filename = mp->normal_texname;
 
-				texture_filename = "Models/Materials/" + texture_filename;
-				specular_filename = "Models/Materials/" + specular_filename;
-				normal_filename = "Models/Materials/" + normal_filename;
-
-				cout << texture_filename << " - Texture" << endl;
-				cout << specular_filename << " - Specular" << endl;
-				cout << normal_filename << " - Normal" << endl;
-
-				//Load texture from path
-				Texture tex = LoadTexture(texture_filename.c_str(), "texture_diffuse");
-				Texture spec = LoadTexture(specular_filename.c_str(), "texture_specular");
-				Texture norm = LoadTexture(normal_filename.c_str(), "texture_normal");
-
-				meshTextures.push_back(tex);
-				meshTextures.push_back(spec);
-				//meshTextures.push_back(norm);
-
-				textures.push_back(meshTextures);
+				if (!normal_filename._Equal(""))
+				{
+					normal_filename = path + normal_filename;
+					std::cout << normal_filename << " - Normal" << endl;
+					Texture norm = LoadTexture(normal_filename.c_str(), "texture_normal");
+					meshTextures.push_back(norm);
+				}
+				else
+				{
+					Texture norm = {};
+					norm.id = 0;
+					norm.type = "texture_normal";
+					meshTextures.push_back(norm);
+				}
 			}
+
+			if (mp->bump_texname.length() > 0)
+			{
+				std::string bump_filename = mp->bump_texname;
+
+				if (!bump_filename._Equal(""))
+				{
+					bump_filename = path + bump_filename;
+					std::cout << bump_filename << " - Bump" << endl;
+					Texture bump = LoadTexture(bump_filename.c_str(), "texture_bump");
+					meshTextures.push_back(bump);
+				}
+				else
+				{
+					Texture bump = {};
+					bump.id = 0;
+					bump.type = "texture_bump";
+					meshTextures.push_back(bump);
+				}
+			}
+
+			textures.push_back(meshTextures);
 
 		}
 
@@ -114,19 +181,23 @@ private:
 				Vertex vert = {};
 
 				vert.Position = {
-					attrib.vertices[3 * (int32_t)index.vertex_index + 0],
-					attrib.vertices[3 * (int32_t)index.vertex_index + 1],
-					attrib.vertices[3 * (int32_t)index.vertex_index + 2]};
+					attrib.vertices[3 * index.vertex_index + 0],
+					attrib.vertices[3 * index.vertex_index + 1],
+					attrib.vertices[3 * index.vertex_index + 2]};
 
-				vert.TexCoords = {
-					attrib.texcoords[2 * (int32_t)index.texcoord_index + 0],
-					1.0f - attrib.texcoords[2 * (int32_t)index.texcoord_index + 1]
-				};
+
+				if (!attrib.texcoords.empty())
+				{
+					vert.TexCoords = {
+						attrib.texcoords[2 * index.texcoord_index + 0],
+						attrib.texcoords[2 * index.texcoord_index + 1]
+					};
+				}
 
 				vert.Normal = {
-					attrib.normals[3 * (int32_t)index.normal_index + 0],
-					attrib.normals[3 * (int32_t)index.normal_index + 1],
-					attrib.normals[3 * (int32_t)index.normal_index + 2]
+					attrib.normals[3 * index.normal_index + 0],
+					attrib.normals[3 * index.normal_index + 1],
+					attrib.normals[3 * index.normal_index + 2]
 				};
 
 				meshVerts.push_back(vert);
@@ -134,7 +205,12 @@ private:
 				meshIndices.push_back(meshIndices.size());
 			}
 
-			meshes.push_back(Mesh(meshVerts, meshIndices, textures[matId])); // TODO - add textures support
+			CalculateTangents(meshIndices, meshVerts);
+
+			if (matId > -1)
+				meshes.push_back(Mesh(meshVerts, meshIndices, textures[matId])); // TODO - add textures support
+			else
+				meshes.push_back(Mesh(meshVerts, meshIndices, {})); // TODO - add textures support
 		}
 	}
 };

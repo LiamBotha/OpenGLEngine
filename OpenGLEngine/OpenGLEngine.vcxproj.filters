@@ -53,6 +53,9 @@
     <ClInclude Include="model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.fs">
@@ -77,6 +80,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="normalShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="skyboxShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="skyboxShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

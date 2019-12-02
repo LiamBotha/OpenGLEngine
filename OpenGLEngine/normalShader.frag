@@ -4,6 +4,7 @@ out vec4 FragColor;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D normal;
     float shininess;
 }; 
 
@@ -48,6 +49,16 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
 
+in VS_OUT {
+    vec3 FragPos;
+    vec2 TexCoords;
+    vec3 TangentLightPos;
+    vec3 TangentViewPos;
+    vec3 TangentFragPos;
+} fs_in;
+
+uniform vec3 lightPos;
+
 uniform vec3 viewPos;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
@@ -61,8 +72,11 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {    
-    // properties
-    vec3 norm = normalize(Normal);
+     // obtain normal from normal map in range [0,1]
+    vec3 normal = texture(material.normal, fs_in.TexCoords).rgb;
+    // transform normal vector to range [-1,1]
+    normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space
+
     vec3 viewDir = normalize(viewPos - FragPos);
     
     // == =====================================================
@@ -72,13 +86,13 @@ void main()
     // this fragment's final color.
     // == =====================================================
     // phase 1: directional lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir);
+    vec3 result = CalcDirLight(dirLight, normal, viewDir);
     // phase 2: point lights
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
-        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+        result += CalcPointLight(pointLights[i], normal, FragPos, viewDir);
     // phase 3: spot light
 	for(int i = 0; i < NR_POINT_LIGHTS; i++)
-		result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);
+		result += CalcSpotLight(spotLights[i], normal, FragPos, viewDir);
     
     FragColor = vec4(result, 1.0);
 }
@@ -88,7 +102,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
     vec3 lightDir = normalize(-light.direction);
     // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal,lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
