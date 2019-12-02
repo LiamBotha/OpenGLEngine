@@ -44,7 +44,7 @@ public:
 		position = getPosition;
 		direction = getDirection;
 
-		ambient = { 0.5f, 0.5f, 0.5f };
+		ambient = { 0.4f, 0.4f, 0.4f };
 		diffuse = { 0.8f, 0.8f, 0.8f };
 		specular = { 1.0f, 1.0f, 1.0f };
 
@@ -55,7 +55,7 @@ public:
 		}
 		else if (type == 2)
 		{
-			ambient = { 0.08f, 0.08f, 0.08f };
+			ambient = { 0.1f, 0.1f, 0.1f };
 			diffuse = { 0.4f, 0.4f, 0.4f };
 			specular = { 0.5f, 0.5f, 0.5f };
 		}

@@ -8,6 +8,7 @@
 using namespace glm;
 
 void BuildNormalWalls(float x, float y, float length, float width, float height, int doors[5], vector<Vertex>& vertices);
+void BuildNormalWallsDoors(float x, float y, float length, float width, float height, int doors[5], vector<Vertex>& vertices);
 
 Room GenerateRoom(float x, float y, float length, float width, float height, int doors[], string floorPath, string wallPath, string ceilingPath);
 
@@ -352,7 +353,7 @@ Room GenerateRoom(float x, float y, float length, float width, float height, int
 
 	//BuildWalls(x, y, length, width, height, doors, doorCount, wallVertices);
 	//AssignIndices(doors, doorCount, wallIndices, wallVertices.size());
-	BuildNormalWalls(x, y, length, width, height, doors, wallVertices);
+	BuildNormalWallsDoors(x, y, length, width, height, doors, wallVertices);
 	AssignNewIndices(doors, doorCount, wallIndices, wallVertices.size());
 
 	CalculateNormals(wallIndices, wallVertices, true);
@@ -592,26 +593,114 @@ void BuildNormalWalls(float x, float y, float length, float width, float height,
 	GenerateVert(x - (width / 2), y + (length / 2), height, (int)(1 * length / 2), topHeightTex, vertices);
 }
 
-//void AssignNewIndices(bool doors[4], int doorCount, vector<unsigned int>& indices, int vertSize)
-//{
-//	int yWidth = 8 + (4 * doorCount);
-//	int xWidth = (8 + (2 * doorCount));
-//
-//	int val2 = (vertSize - (xWidth * 2 + (doorCount * 2)));
-//
-//	for (int i = 0, j = 0; j < 4; i += 2, ++j) // increment j in code
-//	{
-//		if (doors != nullptr && doors[j] == true)
-//		{
-//			DrawDoorIndices(i, yWidth, xWidth, doorCount, j + 1, indices);
-//			i += 2;
-//		}
-//		else
-//		{
-//			DrawQuadIndices(i, yWidth, indices);
-//		}
-//	}
-//}
+void BuildNormalWallsDoors(float x, float y, float length, float width, float height, int doors[5], vector<Vertex>& vertices)
+{
+	length -= 0.001f;
+	width -= 0.001f;
+
+	int lengthFinal = 1.0 * length / 2;
+	int widthFinal = 1.0 * width / 2;
+	int topHeightTex = 1 * height / 2;
+	float middleTexHeight = 0.667 * topHeightTex;
+
+	float doorSize = 0.8f;
+
+	//Bottom
+	//Wall A
+	GenerateVert(x - (width / 2), y + (length / 2), 0, 0, 0.0, vertices);
+	if (doors[0] == 2)
+	{
+		GenerateVert(x - doorSize, y + (length / 2), 0, (0.5 * (widthFinal - doorSize)), 0.0, vertices); // 5.1
+		GenerateVert(x + doorSize, y + (length / 2), 0, (0.5 * (widthFinal + doorSize)), 0.0, vertices); // 5.2
+	}
+	GenerateVert(x + (width / 2), y + (length / 2), 0, widthFinal, 0.0, vertices);
+
+	//Wall B
+	GenerateVert(x + (width / 2), y + (length / 2), 0, 0, 0.0, vertices);
+	if (doors[1] == 2)
+	{
+		GenerateVert(x + (width / 2), y + doorSize, 0, (0.5 * (lengthFinal - doorSize)), 0.0, vertices); // 5.1
+		GenerateVert(x + (width / 2), y - doorSize, 0, (0.5 * (lengthFinal + doorSize)), 0.0, vertices); // 5.2
+	}
+	GenerateVert(x + (width / 2), y - (length / 2), 0, (int)(1 * length / 2), 0.0, vertices);
+
+	//Wall C
+	GenerateVert(x + (width / 2), y - (length / 2), 0, 0.0, 0.0, vertices);
+	if (doors[2] == 2)
+	{
+		GenerateVert(x + doorSize, y - (length / 2), 0, (0.5 * (widthFinal - doorSize)), 0.0, vertices); // 5.1
+		GenerateVert(x - doorSize, y - (length / 2), 0, (0.5 * (widthFinal + doorSize)), 0.0, vertices); // 5.2
+	}
+	GenerateVert(x - (width / 2), y - (length / 2), 0, widthFinal, 0.0, vertices);
+
+	//Wall D
+	GenerateVert(x - (width / 2), y - (length / 2), 0, 0.0, 0.0, vertices);
+	if (doors[3] == 2)
+	{
+		GenerateVert(x - (width / 2), y - doorSize, 0, (0.5 * (lengthFinal - doorSize)), 0.0, vertices); // 5.1
+		GenerateVert(x - (width / 2), y + doorSize, 0, (0.5 * (lengthFinal + doorSize)), 0.0, vertices); // 5.2
+	}
+	GenerateVert(x - (width / 2), y + (length / 2), 0, (int)(1 * length / 2), 0.0, vertices);
+
+	//Middle
+	if (doors[0] == 2)
+	{
+		GenerateVert(x - doorSize, y + (length / 2), (height / 1.5), (0.5 * (widthFinal - doorSize)), middleTexHeight, vertices);
+		GenerateVert(x + doorSize, y + (length / 2), (height / 1.5), (0.5 * (widthFinal + doorSize)), middleTexHeight, vertices);
+	}
+	if (doors[1] == 2)
+	{
+		GenerateVert(x + (width / 2), y + doorSize, (height / 1.5), (0.5 * (lengthFinal - doorSize)), middleTexHeight, vertices);
+		GenerateVert(x + (width / 2), y - doorSize, (height / 1.5), (0.5 * (lengthFinal + doorSize)), middleTexHeight, vertices);
+	}
+	if (doors[2] == 2)
+	{
+		GenerateVert(x + doorSize, y - (length / 2), (height / 1.5), (0.5 * (widthFinal - doorSize)), middleTexHeight, vertices);
+		GenerateVert(x - doorSize, y - (length / 2), (height / 1.5), (0.5 * (widthFinal + doorSize)), middleTexHeight, vertices);
+	}
+	if (doors[3] == 2)
+	{
+		GenerateVert(x - (width / 2), y - doorSize, (height / 1.5), (0.5 * (lengthFinal - doorSize)), middleTexHeight, vertices);
+		GenerateVert(x - (width / 2), y + doorSize, (height / 1.5), (0.5 * (lengthFinal + doorSize)), middleTexHeight, vertices);
+	}
+
+	//Top
+	//Wall A
+	GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, topHeightTex, vertices);
+	if (doors[0] == 2)
+	{
+		GenerateVert(x - doorSize, y + (length / 2), height, (0.5 * (widthFinal - doorSize)), topHeightTex, vertices); // 5.1
+		GenerateVert(x + doorSize, y + (length / 2), height, (0.5 * (widthFinal + doorSize)), topHeightTex, vertices); // 5.2
+	}
+	GenerateVert(x + (width / 2), y + (length / 2), height, widthFinal, topHeightTex, vertices);
+
+	//Wall B
+	GenerateVert(x + (width / 2), y + (length / 2), height, 0.0, topHeightTex, vertices);
+	if (doors[1] == 2)
+	{
+		GenerateVert(x + (width / 2), y + doorSize, height, (0.5 * (lengthFinal - doorSize)), topHeightTex, vertices); // 5.1
+		GenerateVert(x + (width / 2), y - doorSize, height, (0.5 * (lengthFinal + doorSize)), topHeightTex, vertices); // 5.2
+	}
+	GenerateVert(x + (width / 2), y - (length / 2), height, (int)(1 * length / 2), topHeightTex, vertices);
+
+	//Wall C
+	GenerateVert(x + (width / 2), y - (length / 2), height, 0.0, topHeightTex, vertices);
+	if (doors[2] == 2)
+	{
+		GenerateVert(x + doorSize, y - (length / 2), height, (0.5 * (widthFinal - doorSize)), topHeightTex, vertices); // 5.1
+		GenerateVert(x - doorSize, y - (length / 2), height, (0.5 * (widthFinal + doorSize)), topHeightTex, vertices); // 5.2
+	}
+	GenerateVert(x - (width / 2), y - (length / 2), height, widthFinal, topHeightTex, vertices);
+
+	//Wall D
+	GenerateVert(x - (width / 2), y - (length / 2), height, 0.0, topHeightTex, vertices);
+	if (doors[3] == 2)
+	{
+		GenerateVert(x - (width / 2), y - doorSize, height, (0.5 * (lengthFinal - doorSize)), topHeightTex, vertices); // 5.1
+		GenerateVert(x - (width / 2), y + doorSize, height, (0.5 * (lengthFinal + doorSize)), topHeightTex, vertices); // 5.2
+	}
+	GenerateVert(x - (width / 2), y + (length / 2), height, (int)(1 * length / 2), topHeightTex, vertices);
+}
 
 void AssignNewIndices(int doors[5], int doorCount, vector<unsigned int>& indices, int vertSize)
 {

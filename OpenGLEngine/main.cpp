@@ -109,7 +109,6 @@ int main()
 
 	// build and compile shaders
 	// -------------------------
-	Shader ourShader("shader.vs", "shader.fs");
 	Shader lightObjShader("light.vert", "light.frag");
 	Shader normalMapShader("normalShader.vert", "normalShader.frag");
 	Shader skyboxShader("skyboxShader.vert", "skyboxShader.frag");
@@ -483,7 +482,7 @@ void LoadLevelFromFile()
 		}
 	}
 
-	for (int i = 0; i < 20; ++i)
+	for (int i = 0; i < 50; ++i)
 	{
 		pointLights.push_back(Light());
 
@@ -494,7 +493,7 @@ void LoadLevelFromFile()
 	{
 		numRooms = jsonObj["Lights"].size(); // works its a visual studio bug
 
-		numRooms = std::min(numRooms, 20);
+		numRooms = std::min(numRooms, 50);
 
 		for (int i = 0; i < numRooms; ++i)
 		{
