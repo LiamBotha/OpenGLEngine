@@ -171,6 +171,7 @@
   <ItemGroup>
     <Image Include="Textures\img_1.jpg" />
     <Image Include="Textures\img_10.jpg" />
+    <Image Include="Textures\img_11.jpg" />
     <Image Include="Textures\img_2.jpg" />
     <Image Include="Textures\img_3.jpg" />
     <Image Include="Textures\img_4.jpg" />

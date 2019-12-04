@@ -120,5 +120,8 @@
     <Image Include="Textures\img_10.jpg">
       <Filter>Textures</Filter>
     </Image>
+    <Image Include="Textures\img_11.jpg">
+      <Filter>Textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>

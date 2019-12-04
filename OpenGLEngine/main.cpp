@@ -360,13 +360,14 @@ void LoadLevelFromFile()
 		std::cout << "Enter Level Name" << endl;
 		cin >> levelName;
 
-		ifstream jsonFile(levelName + ".json");
+		ifstream jsonFile("Levels/" + levelName + ".json");
 
 		while (jsonFile.is_open())
 		{
 			while (getline(jsonFile, line))
 			{
 				jsonFileString += line;
+				cout << line << endl;
 			}
 			jsonFile.close();
 		}
