@@ -24,6 +24,11 @@ public:
 	unsigned int cubemapTexture;
 	unsigned int VAO;
 
+	Skybox()
+	{
+
+	}
+
 	Skybox(string skyboxName)
 	{
 		setupSkybox(skyboxName);
@@ -114,6 +119,8 @@ private:
 
 unsigned int loadCubeMap(const char* path, std::string baseName, std::string imgType = "jpg")
 {
+	stbi_set_flip_vertically_on_load(false);
+
 	std::string filePath = path + std::string("/") + baseName;
 
 	std::vector<std::string> faces

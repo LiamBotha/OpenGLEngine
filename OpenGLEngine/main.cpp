@@ -61,6 +61,8 @@ bool showFPS = false;
 // lighting
 Light directionalLight = Light({ 0,0,0 }, { 0.0f, -1.0f, 0.0f }, 2);
 
+Skybox skybox = Skybox();
+
 vector<Room> rooms = {};
 vector<Light> pointLights = {};
 vector<Light> spotLights = {};
@@ -112,8 +114,6 @@ int main()
 	Shader lightObjShader("light.vert", "light.frag");
 	Shader normalMapShader("normalShader.vert", "normalShader.frag");
 	Shader skyboxShader("skyboxShader.vert", "skyboxShader.frag");
-
-	Skybox skybox = Skybox("craterlake");
 
 	// load models
 	// -----------
@@ -568,9 +568,11 @@ void LoadLevelFromFile()
 
 	if (!jsonObj["Skybox"].is_null())
 	{
-		string skyboxName = jsonObj["Skybox"]["Name"];
+		json jsonSkybox = jsonObj["Skybox"];
 
-		//skybox = Skybox(skyboxName);
+		string skyName = jsonSkybox["Name"];
+
+		skybox = Skybox(skyName);
 	}
 }
 

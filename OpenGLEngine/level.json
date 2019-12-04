@@ -3,7 +3,7 @@
     {
       "Position": [ 0, 2, 0 ],
       "Length": 15,
-      "Width": 25,
+      "Width": 17,
       "Height": 4,
       "FloorTexture": 8,
       "WallTexture": 10,
@@ -99,6 +99,16 @@
       "WallTexture": 5,
       "CeilingTexture": 6,
       "Doors": [ 1, 2, 2, 2, 1 ]
+    },
+    {
+      "Position": [ -10, 53, 0 ],
+      "Length": 5,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 2, 1, 1, 1 ]
     },
     {
       "Position": [ 12.5, 53, 0 ],
@@ -241,6 +251,16 @@
       "Doors": [ 1, 2, 1, 1, 1 ]
     },
     {
+      "Position": [ 45, 39.5, 0 ],
+      "Length": 5,
+      "Width": 5,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 1, 0, 1, 1 ]
+    },
+    {
       "Position": [ 24, 5.5, 0 ],
       "Length": 5,
       "Width": 9,
@@ -249,6 +269,16 @@
       "WallTexture": 5,
       "CeilingTexture": 6,
       "Doors": [ 1, 0, 1, 2, 1 ]
+    },
+    {
+      "Position": [ 15, 5.5, 0 ],
+      "Length": 5,
+      "Width": 9,
+      "Height": 4,
+      "FloorTexture": 7,
+      "WallTexture": 5,
+      "CeilingTexture": 6,
+      "Doors": [ 1, 0, 1, 1, 1 ]
     }
   ],
   "Models": [
@@ -340,5 +370,6 @@
       "Type": 0,
       "Position": [ 24, 4.4, 5.5 ]
     }
-  ]
+  ],
+  "Skybox": { "Name": "craterlake" }
 }
