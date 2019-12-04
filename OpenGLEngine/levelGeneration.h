@@ -301,15 +301,23 @@ Room GenerateRoom(float x, float y, float length, float width, float height, int
 
 	Texture floorTex = LoadTexture(floorPath.c_str(), "texture_diffuse");
 	Texture floorSpec = LoadTexture(floorPath.c_str(), "texture_specular");
-	Texture floorNorm = LoadTexture("Textures/brickwall_normal.jpg", "texture_normal");
+	
+	floorPath.erase(floorPath.end() - 4, floorPath.end());
+	Texture floorNorm = LoadTexture((floorPath + "_normal.jpg").c_str(), "texture_normal");
+
 	floorTextures.push_back(floorTex);
 	floorTextures.push_back(floorSpec);
 	floorTextures.push_back(floorNorm);
 
 	Texture wallTex = LoadTexture(wallPath.c_str(), "texture_diffuse");
 	Texture wallSpec = LoadTexture(wallPath.c_str(), "texture_specular");
+
+	wallPath.erase(wallPath.end() - 4, wallPath.end());
+	Texture wallNorm = LoadTexture((wallPath + "_normal.jpg").c_str(), "texture_normal");
+
 	wallTextures.push_back(wallTex);
 	wallTextures.push_back(wallSpec);
+	wallTextures.push_back(wallNorm);
 
 	int texCoordWidth = (1 * width / 2);
 	int texCoordLength = (1 * length / 2);
@@ -318,7 +326,12 @@ Room GenerateRoom(float x, float y, float length, float width, float height, int
 	{
 		Texture ceilingTex = LoadTexture(ceilingPath.c_str(), "texture_diffuse");
 		Texture ceilingSpec = LoadTexture(ceilingPath.c_str(), "texture_specular");
+
+		ceilingPath.erase(ceilingPath.end() - 4, ceilingPath.end());
+		Texture ceilingNorm = LoadTexture((ceilingPath + "_normal.jpg").c_str(), "texture_normal");
+
 		ceilingTextures.push_back(ceilingTex);
+		ceilingTextures.push_back(ceilingSpec);
 		ceilingTextures.push_back(ceilingSpec);
 
 		GenerateVert(x - (width / 2), y + (length / 2), height, 0.0, texCoordLength, ceilingVertices); // 0

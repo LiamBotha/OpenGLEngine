@@ -367,7 +367,6 @@ void LoadLevelFromFile()
 			while (getline(jsonFile, line))
 			{
 				jsonFileString += line;
-				cout << line << endl;
 			}
 			jsonFile.close();
 		}

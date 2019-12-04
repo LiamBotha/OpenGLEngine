@@ -283,8 +283,18 @@
   ],
   "Models": [
     {
-      "ObjectID": 2,
-      "Position": [ -1, 0, -10 ],
+      "ObjectID": 3,
+      "Position": [ 31, 0, 43 ],
+      "Rotation": [ 0, 0, 0 ]
+    },
+    {
+      "ObjectID": 4,
+      "Position": [ 7.5, 0, 8 ],
+      "Rotation": [ 0, 0, 0 ]
+    },
+    {
+      "ObjectID": 4,
+      "Position": [ -7.5, 0, 8 ],
       "Rotation": [ 0, 0, 0 ]
     }
   ],
@@ -371,5 +381,5 @@
       "Position": [ 24, 4.4, 5.5 ]
     }
   ],
-  "Skybox": { "Name": "craterlake" }
+  "Skybox": { "Name": "flatrock" }
 }
