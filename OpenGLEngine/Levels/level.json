@@ -283,17 +283,17 @@
   ],
   "Models": [
     {
-      "ObjectID": 3,
+      "ObjectID": 2,
       "Position": [ 31, 0, 43 ],
       "Rotation": [ 0, 0, 0 ]
     },
     {
-      "ObjectID": 4,
+      "ObjectID": 2,
       "Position": [ 7.5, 0, 8 ],
       "Rotation": [ 0, 0, 0 ]
     },
     {
-      "ObjectID": 4,
+      "ObjectID": 3,
       "Position": [ -7.5, 0, 8 ],
       "Rotation": [ 0, 0, 0 ]
     }
